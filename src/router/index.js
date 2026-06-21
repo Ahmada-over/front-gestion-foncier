@@ -1,8 +1,8 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/login',
@@ -44,6 +44,12 @@ const router = createRouter({
       path: '/certificats/:id',
       name: 'certificat-detail',
       component: () => import('../views/CertificatDetailView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/certificats/nouveau',
+      name: 'nouveau-certificat',
+      component: () => import('../views/NouvelCertificatView.vue'),
       meta: { requiresAuth: true }
     },
     {

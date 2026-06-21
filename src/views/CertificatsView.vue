@@ -11,7 +11,7 @@
         <h1 class="text-h5 font-weight-bold mb-1" style="color: #1a3b5c;">Certificats d'occupation</h1>
         <div class="text-subtitle-2 text-grey-darken-1">Gérez et suivez les titres d'occupation du village de Taofikh Bousso.</div>
       </div>
-      <v-btn color="#0a2540" prepend-icon="mdi-plus" rounded="lg" elevation="0" class="text-none font-weight-medium">
+      <v-btn color="#0a2540" prepend-icon="mdi-plus" rounded="lg" elevation="0" class="text-none font-weight-medium" to="/certificats/nouveau">
         Nouveau certificat
       </v-btn>
     </div>
@@ -124,7 +124,7 @@
             </td>
             <td class="text-center py-4">
               <v-btn size="x-small" variant="text" icon="mdi-eye-outline" class="mx-0" color="grey-darken-1" :to="`/certificats/${item.id}`"></v-btn>
-              <v-btn size="x-small" variant="text" icon="mdi-pencil-outline" class="mx-0" color="grey-darken-1"></v-btn>
+              <v-btn size="x-small" variant="text" icon="mdi-pencil-outline" class="mx-0" color="grey-darken-1" :to="`/certificats/${item.id}/edit`"></v-btn>
               <v-btn size="x-small" variant="text" icon="mdi-download-outline" class="mx-0" color="grey-darken-1" @click="downloadPdf(item.id)"></v-btn>
               <v-btn size="x-small" variant="text" icon="mdi-dots-vertical" class="mx-0" color="grey-darken-1"></v-btn>
             </td>

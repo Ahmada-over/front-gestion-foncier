@@ -24,8 +24,8 @@ const request = async (endpoint, options = {}) => {
     if (response.status === 401) {
       removeToken()
       // Avoid redirect loop: only redirect if not already on login
-      if (!window.location.pathname.startsWith('/login')) {
-        window.location.href = '/login'
+      if (!window.location.hash.startsWith('#/login')) {
+        window.location.hash = '#/login'
       }
       throw new Error('Session expirée')
     }

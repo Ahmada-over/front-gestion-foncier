@@ -29,15 +29,28 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/actes/:id/editer',
+      name: 'edit-acte',
+      component: () => import('../views/EditActeView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/actes/:id',
       name: 'acte-detail',
       component: () => import('../views/ActeDetailView.vue'),
       meta: { requiresAuth: true }
     },
+
     {
       path: '/certificats',
       name: 'certificats',
       component: () => import('../views/CertificatsView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/certificats/nouveau',
+      name: 'nouveau-certificat',
+      component: () => import('../views/NouveauCertificatView.vue'),
       meta: { requiresAuth: true }
     },
     {
@@ -50,6 +63,30 @@ const router = createRouter({
       path: '/parcelles',
       name: 'parcelles',
       component: () => import('../views/ParcellesView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/parcelles/:id',
+      name: 'parcelle-detail',
+      component: () => import('../views/ParcelleDetailView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/proprietaires',
+      name: 'proprietaires',
+      component: () => import('../views/ProprietairesView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/proprietaires/:id',
+      name: 'proprietaire-detail',
+      component: () => import('../views/ProprietaireDetailView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/patrimoine',
+      name: 'patrimoine',
+      component: () => import('../views/PatrimoineFamilialView.vue'),
       meta: { requiresAuth: true }
     }
   ]

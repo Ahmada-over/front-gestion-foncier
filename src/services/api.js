@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:8081/api/v1'
+const API_URL = 'http://localhost:8005/api/v1'
 
 const getToken = () => localStorage.getItem('access_token')
 const setToken = (token) => localStorage.setItem('access_token', token)
@@ -48,7 +48,7 @@ const request = async (endpoint, options = {}) => {
 const downloadFile = (endpoint, filename) => {
   const token = getToken()
   const separator = endpoint.includes('?') ? '&' : '?'
-  const url = `${API_URL}${endpoint}${separator}token=${token}`
+  const url = `${API_URL}${endpoint}${separator}token=${token}&t=${Date.now()}`
   
   const a = document.createElement('a')
   a.href = url
@@ -86,8 +86,13 @@ export const api = {
     getAll: (skip = 0, limit = 100) => request(`/actes/?skip=${skip}&limit=${limit}`),
     getById: (id) => request(`/actes/${id}`),
     create: (data) => request('/actes/', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id, data) => request(`/actes/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     valider: (id) => request(`/actes/${id}/valider`, { method: 'POST' }),
     downloadPdf: (id, filename) => downloadFile(`/actes/${id}/pdf`, filename),
+    getQrcodeImage: async (id) => {
+      const blob = await request(`/actes/${id}/qrcode`, { responseType: 'blob' })
+      return URL.createObjectURL(blob)
+    },
     getQrcodeUrl: (id) => getFileBlobUrl(`/actes/${id}/qrcode`),
     downloadPdfUrl: (id) => `${API_URL}/actes/${id}/pdf`, // Deprecated, use downloadPdf
     qrcodeUrl: (id) => `${API_URL}/actes/${id}/qrcode`   // Deprecated, use getQrcodeUrl
@@ -96,8 +101,13 @@ export const api = {
     getAll: (skip = 0, limit = 100) => request(`/certificats/?skip=${skip}&limit=${limit}`),
     getById: (id) => request(`/certificats/${id}`),
     create: (data) => request('/certificats/', { method: 'POST', body: JSON.stringify(data) }),
+    valider: (id) => request(`/certificats/${id}/valider`, { method: 'POST' }),
     revoquer: (id) => request(`/certificats/${id}/revoquer`, { method: 'POST' }),
     downloadPdf: (id, filename) => downloadFile(`/certificats/${id}/pdf`, filename),
+    getQrcodeImage: async (id) => {
+      const blob = await request(`/certificats/${id}/qrcode`, { responseType: 'blob' })
+      return URL.createObjectURL(blob)
+    },
     getQrcodeUrl: (id) => getFileBlobUrl(`/certificats/${id}/qrcode`),
     downloadPdfUrl: (id) => `${API_URL}/certificats/${id}/pdf`, // Deprecated
     qrcodeUrl: (id) => `${API_URL}/certificats/${id}/qrcode`   // Deprecated
@@ -121,6 +131,16 @@ export const api = {
       return request(url)
     },
     getById: (id) => request(`/proprietaires/${id}`),
-    create: (data) => request('/proprietaires/', { method: 'POST', body: JSON.stringify(data) })
+    create: (data) => request('/proprietaires/', { method: 'POST', body: JSON.stringify(data) }),
+    getParcelles: (id) => request(`/proprietaires/${id}/parcelles`),
+    getActes: (id) => request(`/proprietaires/${id}/actes`),
+    getStats: () => request('/proprietaires/stats')
+  },
+  patrimoine: {
+    getStats: () => request('/patrimoine/stats'),
+    getMembres: (skip = 0, limit = 100) => request(`/patrimoine/membres?skip=${skip}&limit=${limit}`),
+    createMembre: (data) => request('/patrimoine/membres', { method: 'POST', body: JSON.stringify(data) }),
+    getAffectations: (skip = 0, limit = 100) => request(`/patrimoine/affectations?skip=${skip}&limit=${limit}`),
+    affecterParcelle: (data) => request('/patrimoine/affectations', { method: 'POST', body: JSON.stringify(data) })
   }
 }

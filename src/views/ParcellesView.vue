@@ -11,6 +11,58 @@
       </v-btn>
     </div>
 
+    <!-- Stats Cards -->
+    <v-row class="mb-2 mt-4" v-if="!loading">
+      <!-- Total des parcelles -->
+      <v-col cols="12" sm="6" md="3">
+        <v-card elevation="0" border rounded="xl" class="pa-5 h-100 stat-card">
+          <div class="d-flex justify-space-between align-start mb-4">
+            <v-avatar color="indigo-lighten-5" size="48" rounded="lg">
+              <v-icon color="indigo-darken-2">mdi-map-marker-multiple-outline</v-icon>
+            </v-avatar>
+          </div>
+          <div class="text-overline text-grey-darken-1 font-weight-medium mb-1" style="letter-spacing: 1px;">TOTAL PARCELLES</div>
+          <div class="text-h4 font-weight-black" style="color: #1a3b5c;">{{ totalParcelles }}</div>
+        </v-card>
+      </v-col>
+      <!-- Total occupés -->
+      <v-col cols="12" sm="6" md="3">
+        <v-card elevation="0" border rounded="xl" class="pa-5 h-100 stat-card">
+          <div class="d-flex justify-space-between align-start mb-4">
+            <v-avatar color="blue-lighten-5" size="48" rounded="lg">
+              <v-icon color="blue-darken-2">mdi-home-city-outline</v-icon>
+            </v-avatar>
+          </div>
+          <div class="text-overline text-grey-darken-1 font-weight-medium mb-1" style="letter-spacing: 1px;">TOTAL OCCUPÉES</div>
+          <div class="text-h4 font-weight-black" style="color: #0288d1;">{{ totalOccupees }}</div>
+        </v-card>
+      </v-col>
+      <!-- Total disponibles -->
+      <v-col cols="12" sm="6" md="3">
+        <v-card elevation="0" border rounded="xl" class="pa-5 h-100 stat-card">
+          <div class="d-flex justify-space-between align-start mb-4">
+            <v-avatar color="green-lighten-5" size="48" rounded="lg">
+              <v-icon color="green-darken-2">mdi-map-marker-check-outline</v-icon>
+            </v-avatar>
+          </div>
+          <div class="text-overline text-grey-darken-1 font-weight-medium mb-1" style="letter-spacing: 1px;">TOTAL DISPONIBLES</div>
+          <div class="text-h4 font-weight-black" style="color: #2e7d32;">{{ totalDisponibles }}</div>
+        </v-card>
+      </v-col>
+      <!-- Total en litiges -->
+      <v-col cols="12" sm="6" md="3">
+        <v-card elevation="0" border rounded="xl" class="pa-5 h-100 stat-card">
+          <div class="d-flex justify-space-between align-start mb-4">
+            <v-avatar color="red-lighten-5" size="48" rounded="lg">
+              <v-icon color="red-darken-2">mdi-alert-octagon-outline</v-icon>
+            </v-avatar>
+          </div>
+          <div class="text-overline text-grey-darken-1 font-weight-medium mb-1" style="letter-spacing: 1px;">TOTAL EN LITIGES</div>
+          <div class="text-h4 font-weight-black" style="color: #c62828;">{{ totalLitiges }}</div>
+        </v-card>
+      </v-col>
+    </v-row>
+
     <!-- Main Content Container -->
     <v-card elevation="0" border rounded="xl" class="pa-0 mt-6 bg-white">
       
@@ -60,7 +112,7 @@
         </thead>
         <tbody>
           <v-progress-linear v-if="loading" indeterminate color="primary"></v-progress-linear>
-          <tr v-for="item in parcelles" :key="item.id" class="border-b-thin align-middle">
+          <tr v-for="item in parcelles" :key="item.id" class="border-b-thin align-middle parcelle-row" @click="goToDetail(item.id)">
             <td class="font-weight-bold text-primary py-4">{{ item.numero_parcelle }}</td>
             <td class="text-grey-darken-3 font-weight-medium py-4">{{ item.superficie_m2 }} m²</td>
             <td class="text-grey-darken-1 py-4">{{ item.localisation || 'Non spécifiée' }}</td>
@@ -71,8 +123,9 @@
             </td>
             <td class="text-right text-grey-darken-1 py-4 text-body-2">{{ formatDate(item.created_at) }}</td>
             <td class="text-center py-4 text-grey-darken-1">
-              <v-btn size="x-small" variant="text" icon="mdi-pencil-outline" class="mx-1" color="grey-darken-1" @click="openEditDialog(item)"></v-btn>
-              <v-btn size="x-small" variant="text" icon="mdi-delete-outline" class="mx-1" color="error" @click="confirmDelete(item)"></v-btn>
+              <v-btn size="x-small" variant="text" icon="mdi-eye-outline" class="mx-1" color="primary" @click.stop="goToDetail(item.id)"></v-btn>
+              <v-btn size="x-small" variant="text" icon="mdi-pencil-outline" class="mx-1" color="grey-darken-1" @click.stop="openEditDialog(item)"></v-btn>
+              <v-btn size="x-small" variant="text" icon="mdi-delete-outline" class="mx-1" color="error" @click.stop="confirmDelete(item)"></v-btn>
             </td>
           </tr>
           <tr v-if="!loading && parcelles.length === 0">
@@ -175,9 +228,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { api } from '../services/api'
+import { notify } from '../services/notifier'
 
+const router = useRouter()
+
+const allLoadedParcelles = ref([])
 const parcelles = ref([])
 const loading = ref(true)
 const search = ref('')
@@ -201,7 +259,8 @@ const deleting = ref(false)
 const fetchParcelles = async () => {
   loading.value = true
   try {
-    const data = await api.parcelles.getAll(0, 100, search.value)
+    const data = await api.parcelles.getAll(0, 500, search.value)
+    allLoadedParcelles.value = data
     if (statutFilter.value !== 'Tous les statuts') {
       parcelles.value = data.filter(p => p.statut.toLowerCase() === statutFilter.value.toLowerCase().replace('é', 'e'))
     } else {
@@ -215,6 +274,15 @@ const fetchParcelles = async () => {
 }
 
 onMounted(fetchParcelles)
+
+const goToDetail = (id) => {
+  router.push(`/parcelles/${id}`)
+}
+
+const totalParcelles = computed(() => allLoadedParcelles.value.length)
+const totalOccupees = computed(() => allLoadedParcelles.value.filter(p => p.statut.toLowerCase() === 'occupee' || p.statut.toLowerCase() === 'occupée').length)
+const totalDisponibles = computed(() => allLoadedParcelles.value.filter(p => p.statut.toLowerCase() === 'disponible').length)
+const totalLitiges = computed(() => allLoadedParcelles.value.filter(p => p.statut.toLowerCase() === 'litigieuse').length)
 
 const getStatusProps = (statut) => {
   const s = (statut || '').toLowerCase()
@@ -256,9 +324,10 @@ const save = async () => {
       await api.parcelles.create(editedItem.value)
     }
     dialog.value = false
+    notify.success(isEdit.value ? 'Parcelle modifiée avec succès' : 'Parcelle ajoutée avec succès')
     fetchParcelles()
   } catch (error) {
-    alert(error.message)
+    notify.error(error.message)
   } finally {
     saving.value = false
   }
@@ -272,21 +341,12 @@ const confirmDelete = (item) => {
 const doDelete = async () => {
   deleting.value = true
   try {
-    // Note: I added the delete endpoint in the backend but not yet in api.js
-    // I should add it to api.js first or use a generic request
-    // Let's assume I'll add it to api.js
-    const token = localStorage.getItem('access_token')
-    const response = await fetch(`http://localhost:8081/api/v1/parcelles/${itemToDelete.value.id}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    if (!response.ok) throw new Error('Erreur suppression')
+    await api.parcelles.delete(itemToDelete.value.id)
     deleteDialog.value = false
+    notify.success('Parcelle supprimée avec succès')
     fetchParcelles()
   } catch (error) {
-    alert(error.message)
+    notify.error(error.message)
   } finally {
     deleting.value = false
   }
@@ -298,4 +358,18 @@ const doDelete = async () => {
 .border-t { border-top: 1px solid rgba(0,0,0,0.06); }
 .border-b-thin { border-bottom: 1px solid rgba(0,0,0,0.03); }
 .gap-4 { gap: 16px; }
+.parcelle-row {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.stat-card {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+}
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px -8px rgba(0,0,0,0.1) !important;
+}
+.parcelle-row:hover {
+  background-color: rgba(25, 118, 210, 0.04);
+}
 </style>

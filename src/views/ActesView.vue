@@ -11,6 +11,58 @@
       </v-btn>
     </div>
 
+    <!-- Stats Cards -->
+    <v-row class="mb-2 mt-4" v-if="!loading">
+      <!-- Total actifs -->
+      <v-col cols="12" sm="6" md="3">
+        <v-card elevation="0" border rounded="xl" class="pa-5 h-100 stat-card">
+          <div class="d-flex justify-space-between align-start mb-4">
+            <v-avatar color="blue-lighten-5" size="48" rounded="lg">
+              <v-icon color="blue-darken-2">mdi-check-decagram-outline</v-icon>
+            </v-avatar>
+          </div>
+          <div class="text-overline text-grey-darken-1 font-weight-medium mb-1" style="letter-spacing: 1px;">TOTAL ACTIFS</div>
+          <div class="text-h4 font-weight-black" style="color: #1a3b5c;">{{ stats.actifs }}</div>
+        </v-card>
+      </v-col>
+      <!-- En expiration -->
+      <v-col cols="12" sm="6" md="3">
+        <v-card elevation="0" border rounded="xl" class="pa-5 h-100 stat-card">
+          <div class="d-flex justify-space-between align-start mb-4">
+            <v-avatar color="orange-lighten-5" size="48" rounded="lg">
+              <v-icon color="orange-darken-2">mdi-clock-alert-outline</v-icon>
+            </v-avatar>
+          </div>
+          <div class="text-overline text-grey-darken-1 font-weight-medium mb-1" style="letter-spacing: 1px;">EN EXPIRATION</div>
+          <div class="text-h4 font-weight-black" style="color: #e65100;">{{ stats.expirations }}</div>
+        </v-card>
+      </v-col>
+      <!-- Brouillons -->
+      <v-col cols="12" sm="6" md="3">
+        <v-card elevation="0" border rounded="xl" class="pa-5 h-100 stat-card">
+          <div class="d-flex justify-space-between align-start mb-4">
+            <v-avatar color="grey-lighten-4" size="48" rounded="lg">
+              <v-icon color="grey-darken-2">mdi-file-edit-outline</v-icon>
+            </v-avatar>
+          </div>
+          <div class="text-overline text-grey-darken-1 font-weight-medium mb-1" style="letter-spacing: 1px;">BROUILLONS</div>
+          <div class="text-h4 font-weight-black" style="color: #424242;">{{ stats.brouillons }}</div>
+        </v-card>
+      </v-col>
+      <!-- Révocations -->
+      <v-col cols="12" sm="6" md="3">
+        <v-card elevation="0" border rounded="xl" class="pa-5 h-100 stat-card">
+          <div class="d-flex justify-space-between align-start mb-4">
+            <v-avatar color="red-lighten-5" size="48" rounded="lg">
+              <v-icon color="red-darken-2">mdi-close-octagon-outline</v-icon>
+            </v-avatar>
+          </div>
+          <div class="text-overline text-grey-darken-1 font-weight-medium mb-1" style="letter-spacing: 1px;">RÉVOCATIONS</div>
+          <div class="text-h4 font-weight-black" style="color: #c62828;">{{ stats.revocations }}</div>
+        </v-card>
+      </v-col>
+    </v-row>
+
     <!-- Main Content Container -->
     <v-card elevation="0" border rounded="xl" class="pa-0 mt-6 bg-white">
       
@@ -93,7 +145,7 @@
       <!-- Pagination / Footer -->
       <div class="d-flex justify-space-between align-center px-6 py-4 border-t bg-white" style="border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;">
         <div class="text-caption text-grey-darken-1">
-          Affichage de <span class="font-weight-bold">1</span> à <span class="font-weight-bold">10</span> sur <span class="font-weight-bold">42</span> actes
+          Affichage de <span class="font-weight-bold">1</span> à <span class="font-weight-bold">{{ actes.length }}</span> sur <span class="font-weight-bold">{{ actes.length }}</span> actes
         </div>
         <div class="d-flex align-center gap-1">
           <v-btn icon="mdi-chevron-left" variant="text" size="small" color="grey-darken-1" disabled></v-btn>
@@ -120,7 +172,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { api } from '../services/api'
 
 const filters = ref({
@@ -129,12 +181,23 @@ const filters = ref({
 })
 
 const actes = ref([])
+const allActes = ref([])
 const loading = ref(true)
+
+const stats = computed(() => {
+  return {
+    actifs: allActes.value.filter(a => a.statut.toLowerCase() === 'validé' || a.statut.toLowerCase() === 'valide').length,
+    expirations: 0, // Pour les actes de vente, pas d'expiration en général
+    brouillons: allActes.value.filter(a => a.statut.toLowerCase() === 'brouillon').length,
+    revocations: allActes.value.filter(a => a.statut.toLowerCase() === 'annulé' || a.statut.toLowerCase() === 'annule').length
+  }
+})
 
 const fetchActes = async () => {
   loading.value = true
   try {
     const data = await api.actes.getAll()
+    allActes.value = data
     actes.value = data.map(acte => ({
       rawId: acte.id,
       id: acte.numero_acte || `AV-${acte.id.substring(0, 8)}`,
@@ -193,5 +256,12 @@ const downloadPdf = (id) => {
 }
 .v-table .v-table__wrapper > table > tbody > tr:not(:last-child) > td {
   border-bottom: 1px solid rgba(0,0,0,0.03) !important;
+}
+.stat-card {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+}
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px -8px rgba(0,0,0,0.1) !important;
 }
 </style>

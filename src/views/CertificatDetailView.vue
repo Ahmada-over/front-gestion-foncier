@@ -23,7 +23,10 @@
         <v-btn variant="outlined" color="grey-darken-1" prepend-icon="mdi-printer-outline" rounded="lg" class="text-none font-weight-medium" size="small">
           Imprimer
         </v-btn>
-        <v-btn color="#0a2540" prepend-icon="mdi-download-outline" rounded="lg" elevation="0" class="text-none font-weight-medium" size="small" @click="downloadPdf">
+        <v-btn v-if="cert.statut.toLowerCase() === 'brouillon'" color="success" prepend-icon="mdi-check-decagram" rounded="lg" elevation="0" class="text-none font-weight-medium" size="small" @click="validerCertificat" :loading="validating">
+          Valider le certificat
+        </v-btn>
+        <v-btn v-else-if="cert.statut.toLowerCase() === 'actif'" color="#0a2540" prepend-icon="mdi-download-outline" rounded="lg" elevation="0" class="text-none font-weight-medium" size="small" @click="downloadPdf">
           Télécharger PDF
         </v-btn>
       </div>
@@ -128,7 +131,10 @@
             </div>
           </div>
           <div class="text-caption text-grey-darken-1 mb-4">Ce certificat est infalsifiable grâce à son empreinte numérique unique.</div>
-          <v-btn block variant="tonal" color="primary" size="small" class="text-none font-weight-bold" prepend-icon="mdi-shield-check-outline">
+          <v-btn v-if="!qrCodeUrl" block variant="flat" color="primary" size="small" class="text-none font-weight-bold mb-2" prepend-icon="mdi-qrcode-scan" @click="validerEtGenererQR" :loading="validating">
+            Générer le QR Code
+          </v-btn>
+          <v-btn v-else block variant="tonal" color="primary" size="small" class="text-none font-weight-bold" prepend-icon="mdi-shield-check-outline">
             Vérifier sur la Blockchain
           </v-btn>
         </v-card>
@@ -167,10 +173,12 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { api } from '../services/api'
+import { notify } from '../services/notifier'
 
 const route = useRoute()
 const qrCodeUrl = ref(null)
 const loading = ref(false)
+const validating = ref(false)
 
 const cert = ref({
   numero: '...',
@@ -207,9 +215,12 @@ const fetchCertificat = async () => {
         }
       }
       
-      // Get QR code URL if valid
-      if (cert.value.statut.toLowerCase() === 'actif' || cert.value.statut.toLowerCase() === 'valide') {
-        qrCodeUrl.value = api.certificats.getQrcodeUrl(certId)
+      // Fetch QR code unconditionally. If it fails, it means it's not generated yet.
+      try {
+        qrCodeUrl.value = await api.certificats.getQrcodeImage(certId)
+      } catch (e) {
+        console.warn("QR Code non disponible", e)
+        qrCodeUrl.value = null
       }
     }
   } catch (error) {
@@ -222,6 +233,20 @@ const fetchCertificat = async () => {
 onMounted(() => {
   fetchCertificat()
 })
+
+const validerEtGenererQR = async () => {
+  const certId = route.params.id
+  validating.value = true
+  try {
+    await api.certificats.valider(certId)
+    notify.success("Certificat validé et QR Code généré avec succès")
+    await fetchCertificat()
+  } catch (error) {
+    notify.error("Erreur lors de la génération du QR Code: " + error.message)
+  } finally {
+    validating.value = false
+  }
+}
 
 const isNearExpiration = computed(() => {
   // Demo logic
@@ -249,6 +274,27 @@ const downloadPdf = () => {
   const certId = route.params.id
   if (certId) {
     api.certificats.downloadPdf(certId, `certificat_${cert.value.numero}.pdf`)
+  }
+}
+
+const validerCertificat = async () => {
+  const certId = route.params.id
+  if (!certId) return
+  
+  if (!confirm('Êtes-vous sûr de vouloir valider ce certificat ? Cette action est irréversible et générera le QR Code officiel.')) {
+    return
+  }
+  
+  validating.value = true
+  try {
+    await api.certificats.valider(certId)
+    // Reload
+    await fetchCertificat()
+  } catch (e) {
+    console.error(e)
+    alert("Erreur lors de la validation")
+  } finally {
+    validating.value = false
   }
 }
 </script>

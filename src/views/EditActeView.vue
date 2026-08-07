@@ -2,16 +2,16 @@
   <div class="pb-16"> <!-- Padding bottom for sticky footer -->
     <!-- Header -->
     <div class="mb-6">
-      <v-btn variant="text" prepend-icon="mdi-arrow-left" color="primary" class="px-0 text-none font-weight-bold text-caption" to="/actes">
-        RETOUR À LA LISTE
+      <v-btn variant="text" prepend-icon="mdi-arrow-left" color="primary" class="px-0 text-none font-weight-bold text-caption" @click="router.back()">
+        RETOUR
       </v-btn>
       <div class="d-flex justify-space-between align-center mt-2">
-        <h1 class="text-h5 font-weight-bold" style="color: #1a3b5c;">Nouvel acte de vente</h1>
+        <h1 class="text-h5 font-weight-bold" style="color: #1a3b5c;">Édition de l'acte de vente</h1>
         <div class="d-flex align-center bg-white border px-4 py-2 rounded-lg">
-          <v-icon color="success" size="small" class="mr-2">mdi-check-circle</v-icon>
+          <v-icon color="warning" size="small" class="mr-2">mdi-pencil-circle</v-icon>
           <div>
             <div class="text-caption text-grey-darken-1 font-weight-bold" style="line-height: 1;">STATUT ACTUEL</div>
-            <div class="text-body-2 font-weight-bold" style="line-height: 1.2;">Nouveau brouillon</div>
+            <div class="text-body-2 font-weight-bold text-warning" style="line-height: 1.2;">Édition Brouillon</div>
           </div>
         </div>
       </div>
@@ -106,14 +106,6 @@
                   <div class="font-weight-bold text-body-2" style="color: #1a3b5c;">{{ resolvedVendeur.prenom }} {{ resolvedVendeur.nom }}</div>
                   <div class="text-caption text-grey-darken-1">{{ resolvedVendeur.adresse || 'Sans adresse' }}</div>
                 </div>
-                <div v-else-if="vendeurNotFound" class="mt-2">
-                  <v-alert color="warning" variant="tonal" density="compact" class="text-caption mb-2">
-                    Vendeur introuvable.
-                  </v-alert>
-                  <v-btn size="small" variant="outlined" color="primary" block @click="openNewProprietaireDialog('vendeur')">
-                    <v-icon class="mr-1">mdi-account-plus</v-icon> Créer ce vendeur
-                  </v-btn>
-                </div>
               </v-expand-transition>
             </v-card>
           </v-col>
@@ -145,14 +137,6 @@
                 <div v-if="resolvedAcheteur" class="bg-white pa-3 rounded-lg border mt-2">
                   <div class="font-weight-bold text-body-2" style="color: #004d40;">{{ resolvedAcheteur.prenom }} {{ resolvedAcheteur.nom }}</div>
                   <div class="text-caption text-grey-darken-1">{{ resolvedAcheteur.adresse || 'Sans adresse' }}</div>
-                </div>
-                <div v-else-if="acheteurNotFound" class="mt-2">
-                  <v-alert color="warning" variant="tonal" density="compact" class="text-caption mb-2">
-                    Acheteur introuvable.
-                  </v-alert>
-                  <v-btn size="small" variant="outlined" color="teal-darken-2" block @click="openNewProprietaireDialog('acheteur')">
-                    <v-icon class="mr-1">mdi-account-plus</v-icon> Créer cet acheteur
-                  </v-btn>
                 </div>
               </v-expand-transition>
             </v-card>
@@ -261,41 +245,21 @@
       </div>
       
       <div class="d-flex gap-4">
-        <v-btn variant="text" color="primary" class="text-none font-weight-bold" rounded="lg">Annuler</v-btn>
-        <v-btn variant="outlined" color="primary" class="text-none font-weight-bold bg-white" rounded="lg">Enregistrer en brouillon</v-btn>
-        <v-btn color="primary" elevation="0" class="text-none font-weight-bold" rounded="lg" @click="createActe()" :loading="loading">Enregistrer</v-btn>
+        <v-btn variant="text" color="primary" class="text-none font-weight-bold" rounded="lg" @click="router.back()">Annuler</v-btn>
+        <v-btn color="primary" elevation="0" class="text-none font-weight-bold" rounded="lg" @click="updateActe()" :loading="loading">Enregistrer les modifications</v-btn>
       </div>
     </v-card>
-    <!-- Dialog Nouveau Propriétaire -->
-    <v-dialog v-model="newProprietaireDialog" max-width="500">
-      <v-card rounded="xl">
-        <v-card-title class="text-subtitle-1 font-weight-bold pt-6 px-6">
-          Nouveau Propriétaire
-        </v-card-title>
-        <v-card-text class="px-6 pb-6">
-          <v-text-field v-model="newProprietaire.nom" label="Nom" variant="outlined" density="compact" class="mb-3"></v-text-field>
-          <v-text-field v-model="newProprietaire.prenom" label="Prénom" variant="outlined" density="compact" class="mb-3"></v-text-field>
-          <v-text-field v-model="newProprietaire.cin" label="N° CIN / Passeport" variant="outlined" density="compact" class="mb-3"></v-text-field>
-          <v-text-field v-model="newProprietaire.telephone" label="Téléphone" variant="outlined" density="compact" class="mb-3"></v-text-field>
-          <v-text-field v-model="newProprietaire.adresse" label="Adresse" variant="outlined" density="compact"></v-text-field>
-        </v-card-text>
-        <v-card-actions class="px-6 pb-6 pt-0">
-          <v-spacer></v-spacer>
-          <v-btn variant="text" color="grey-darken-1" class="text-none" @click="newProprietaireDialog = false">Annuler</v-btn>
-          <v-btn variant="flat" color="primary" class="text-none" @click="saveNewProprietaire" :loading="savingProprietaire">Créer & Sélectionner</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { api } from '../services/api'
 import { notify } from '../services/notifier'
 
 const router = useRouter()
+const route = useRoute()
 
 const parcelleSearch = ref('')
 const vendeurCin = ref('')
@@ -326,54 +290,47 @@ const acte = ref({
 })
 const loading = ref(false)
 
-const acheteurNotFound = ref(false)
-const vendeurNotFound = ref(false)
-
-const newProprietaireDialog = ref(false)
-const savingProprietaire = ref(false)
-const proprietaireTarget = ref('')
-const newProprietaire = ref({
-  nom: '',
-  prenom: '',
-  cin: '',
-  telephone: '',
-  adresse: ''
-})
-
-const openNewProprietaireDialog = (target) => {
-  proprietaireTarget.value = target
-  newProprietaire.value = {
-    nom: '',
-    prenom: '',
-    cin: target === 'acheteur' ? acheteurCin.value : vendeurCin.value,
-    telephone: '',
-    adresse: ''
-  }
-  newProprietaireDialog.value = true
-}
-
-const saveNewProprietaire = async () => {
-  savingProprietaire.value = true
+const fetchActe = async () => {
+  const acteId = route.params.id
+  if (!acteId) return
+  loading.value = true
   try {
-    const res = await api.proprietaires.create(newProprietaire.value)
-    notify.success("Propriétaire créé avec succès")
-    newProprietaireDialog.value = false
-    
-    if (proprietaireTarget.value === 'acheteur') {
-      resolvedAcheteur.value = res
-      acte.value.acheteur_id = res.id
-      acheteurNotFound.value = false
-    } else {
-      resolvedVendeur.value = res
-      acte.value.vendeur_id = res.id
-      vendeurNotFound.value = false
+    const data = await api.actes.getById(acteId)
+    if (data) {
+      acte.value.parcelle_id = data.parcelle_id
+      acte.value.vendeur_id = data.vendeur_id
+      acte.value.acheteur_id = data.acheteur_id
+      acte.value.montant_cfa = data.montant_cfa
+      acte.value.date_vente = data.date_vente ? new Date(data.date_vente).toISOString().substr(0, 10) : ''
+      
+      if (data.temoins && data.temoins.length > 0) {
+        acte.value.temoins = data.temoins.map(t => ({ nom: t.nom, prenom: t.prenom, cin: t.cin }))
+      }
+      while (acte.value.temoins.length < 3) {
+        acte.value.temoins.push({ nom: '', prenom: '', cin: '' })
+      }
+      
+      parcelleSearch.value = data.numero_parcelle_info || 'Parcelle ID: ' + data.parcelle_id
+      vendeurCin.value = data.vendeur_cin
+      acheteurCin.value = data.acheteur_cin
+      
+      resolvedParcelle.value = {
+        numero_parcelle: data.numero_parcelle_info || 'Parcelle',
+        superficie_m2: '...'
+      }
+      resolvedVendeur.value = { prenom: data.vendeur_prenom, nom: data.vendeur_nom }
+      resolvedAcheteur.value = { prenom: data.acheteur_prenom, nom: data.acheteur_nom }
     }
-  } catch (e) {
-    notify.error("Erreur lors de la création du propriétaire")
+  } catch (error) {
+    console.error("Erreur chargement de l'acte:", error)
   } finally {
-    savingProprietaire.value = false
+    loading.value = false
   }
 }
+
+onMounted(() => {
+  fetchActe()
+})
 
 const lookupParcelle = async () => {
   if (!parcelleSearch.value) return
@@ -389,7 +346,7 @@ const lookupParcelle = async () => {
     } else {
       notify.error("Parcelle non trouvée")
     }
-  } catch (e) {
+  } catch (error) {
     notify.error("Erreur lors de la recherche")
   } finally {
     searchingParcelle.value = false
@@ -399,16 +356,13 @@ const lookupParcelle = async () => {
 const lookupVendeur = async () => {
   if (!vendeurCin.value) return
   searchingVendeur.value = true
-  vendeurNotFound.value = false
   try {
-    const data = await api.proprietaires.getAll(0, 1, '', vendeurCin.value)
+    const data = await api.proprietaires.getAll(0, 5, '', vendeurCin.value)
     if (data && data.length > 0) {
       resolvedVendeur.value = data[0]
       acte.value.vendeur_id = data[0].id
     } else {
-      vendeurNotFound.value = true
-      resolvedVendeur.value = null
-      notify.error("Vendeur non trouvé")
+      notify.error("Propriétaire non trouvé")
     }
   } catch (e) {
     console.error(e)
@@ -420,16 +374,13 @@ const lookupVendeur = async () => {
 const lookupAcheteur = async () => {
   if (!acheteurCin.value) return
   searchingAcheteur.value = true
-  acheteurNotFound.value = false
   try {
-    const data = await api.proprietaires.getAll(0, 1, '', acheteurCin.value)
+    const data = await api.proprietaires.getAll(0, 5, '', acheteurCin.value)
     if (data && data.length > 0) {
       resolvedAcheteur.value = data[0]
       acte.value.acheteur_id = data[0].id
     } else {
-      acheteurNotFound.value = true
-      resolvedAcheteur.value = null
-      notify.error("Acheteur non trouvé")
+      notify.error("Propriétaire non trouvé")
     }
   } catch (e) {
     console.error(e)
@@ -438,7 +389,7 @@ const lookupAcheteur = async () => {
   }
 }
 
-const createActe = async () => {
+const updateActe = async () => {
   if (parcelleSearch.value && !acte.value.parcelle_id) await lookupParcelle()
   if (vendeurCin.value && !acte.value.vendeur_id) await lookupVendeur()
   if (acheteurCin.value && !acte.value.acheteur_id) await lookupAcheteur()
@@ -450,7 +401,6 @@ const createActe = async () => {
 
   loading.value = true
   try {
-    // Prepare exact payload as requested
     const payload = {
       parcelle_id: acte.value.parcelle_id,
       vendeur_id: acte.value.vendeur_id,
@@ -460,17 +410,12 @@ const createActe = async () => {
       temoins: acte.value.temoins.filter(t => t.nom && t.prenom && t.cin)
     }
     
-    const response = await api.actes.create(payload)
-    notify.success("Acte de vente créé avec succès")
-    setTimeout(() => {
-      if (response && response.id) {
-        router.push(`/actes/${response.id}`)
-      } else {
-        router.push('/actes')
-      }
-    }, 3000)
+    await api.actes.update(route.params.id, payload)
+    notify.success("Acte de vente modifié avec succès")
+    router.push(`/actes/${route.params.id}`)
   } catch (error) {
     notify.error('Erreur: ' + (error.response?.data?.detail || error.message))
+  } finally {
     loading.value = false
   }
 }

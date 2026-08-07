@@ -18,6 +18,9 @@
         <v-btn color="#0a2540" prepend-icon="mdi-download-outline" rounded="lg" elevation="0" class="text-none font-weight-medium" size="small" @click="downloadPdf" :disabled="acte.statut.toLowerCase() === 'brouillon'">
           Télécharger PDF
         </v-btn>
+        <v-btn v-if="acte.statut.toLowerCase() === 'brouillon'" variant="outlined" color="primary" prepend-icon="mdi-pencil" rounded="lg" class="text-none font-weight-medium" size="small" :to="`/actes/${route.params.id}/editer`">
+          Éditer l'acte
+        </v-btn>
         <v-btn v-if="acte.statut.toLowerCase() === 'brouillon'" color="success" prepend-icon="mdi-check-decagram" rounded="lg" elevation="0" class="text-none font-weight-medium" size="small" :loading="validating" @click="validerActe">
           Valider l'acte
         </v-btn>
@@ -205,7 +208,10 @@
             </div>
           </div>
           <div class="text-caption text-grey-darken-1 mb-4">Scanner pour vérifier l'authenticité de cet acte sur le portail public.</div>
-          <v-chip color="success" variant="flat" class="font-weight-bold text-caption">
+          <v-btn v-if="!qrCodeUrl" block variant="flat" color="success" size="small" class="text-none font-weight-bold mb-2" prepend-icon="mdi-qrcode-scan" @click="validerEtGenererQR" :loading="validating">
+            Générer le QR Code
+          </v-btn>
+          <v-chip v-else color="success" variant="flat" class="font-weight-bold text-caption mt-2">
             <v-icon size="14" class="mr-1">mdi-shield-check</v-icon>
             CERTIFIÉ PAR BLOCKCHAIN
           </v-chip>
@@ -267,6 +273,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { api } from '../services/api'
+import { notify } from '../services/notifier'
 
 const route = useRoute()
 const qrCodeUrl = ref(null)
@@ -345,14 +352,12 @@ const fetchActe = async () => {
           : acte.value.temoins
       }
     }
-    
-    // Get QR code URL if validated
-    if (acte.value.statut.toLowerCase() === 'validé' || acte.value.statut.toLowerCase() === 'valide') {
-      try {
-        qrCodeUrl.value = api.actes.getQrcodeUrl(acteId)
-      } catch (e) {
-        console.warn("QR code non disponible:", e)
-      }
+    // Fetch QR code unconditionally
+    try {
+      qrCodeUrl.value = await api.actes.getQrcodeImage(acteId)
+    } catch (e) {
+      console.warn("QR code non disponible:", e)
+      qrCodeUrl.value = null
     }
   } catch (error) {
     console.error("Erreur lors de la récupération de l'acte:", error)
@@ -362,6 +367,22 @@ const fetchActe = async () => {
 onMounted(() => {
   fetchActe()
 })
+
+
+
+const validerEtGenererQR = async () => {
+  const acteId = route.params.id
+  validating.value = true
+  try {
+    await api.actes.valider(acteId)
+    notify.success("Acte validé et QR Code généré avec succès")
+    await fetchActe()
+  } catch (error) {
+    notify.error("Erreur lors de la génération du QR Code: " + error.message)
+  } finally {
+    validating.value = false
+  }
+}
 
 const getInitials = (name) => {
   if (!name) return '?'

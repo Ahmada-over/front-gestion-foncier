@@ -6,10 +6,33 @@
         <h1 class="text-h4 font-weight-bold" style="color: #1a3b5c;">Répertoire des Propriétaires</h1>
         <p class="text-subtitle-1 text-grey-darken-1 mt-1">Gérez et consultez la liste des propriétaires fonciers enregistrés.</p>
       </div>
-      <v-btn color="#0a2540" prepend-icon="mdi-account-plus" class="text-none font-weight-medium rounded-lg px-6" size="large" elevation="0">
+      <v-btn color="#0f2942" prepend-icon="mdi-account-plus" class="text-none font-weight-bold rounded-lg px-6" size="large" elevation="0" @click="newProprietaireDialog = true">
         Nouveau Propriétaire
       </v-btn>
     </div>
+
+    <!-- Dialog Nouveau Propriétaire -->
+    <v-dialog v-model="newProprietaireDialog" max-width="500" persistent>
+      <v-card rounded="xl" class="pa-2">
+        <v-progress-linear v-if="savingProprietaire" indeterminate color="primary" height="4" class="rounded-top"></v-progress-linear>
+        <v-card-title class="text-subtitle-1 font-weight-bold pt-4 px-6" style="color: #0f2942;">
+          Créer un nouveau propriétaire
+        </v-card-title>
+        <v-card-text class="px-6 pb-6 pt-2">
+          <v-text-field v-model="newProprietaire.prenom" label="Prénom *" variant="outlined" density="compact" class="mb-3" rounded="lg" :disabled="savingProprietaire"></v-text-field>
+          <v-text-field v-model="newProprietaire.nom" label="Nom *" variant="outlined" density="compact" class="mb-3" rounded="lg" :disabled="savingProprietaire"></v-text-field>
+          <v-text-field v-model="newProprietaire.cin" label="N° CIN / Passeport *" variant="outlined" density="compact" class="mb-3" rounded="lg" :disabled="savingProprietaire"></v-text-field>
+          <v-text-field v-model="newProprietaire.telephone" label="Téléphone" variant="outlined" density="compact" class="mb-3" rounded="lg" :disabled="savingProprietaire"></v-text-field>
+          <v-text-field v-model="newProprietaire.adresse" label="Adresse" variant="outlined" density="compact" rounded="lg" :disabled="savingProprietaire"></v-text-field>
+        </v-card-text>
+        <v-card-actions class="px-6 pb-4 pt-0">
+          <v-spacer></v-spacer>
+          <v-btn variant="text" color="grey-darken-1" class="text-none" :disabled="savingProprietaire" @click="newProprietaireDialog = false">Annuler</v-btn>
+          <v-btn variant="flat" color="primary" class="text-none font-weight-bold" rounded="lg" @click="saveNewProprietaire" :loading="savingProprietaire">Créer le propriétaire</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
 
     <!-- KPIs -->
     <v-row class="mb-8">
@@ -186,14 +209,44 @@
   </div>
 </template>
 
-<script setup>
 import { ref, onMounted, computed } from 'vue'
 import { api } from '../services/api'
+import { notification } from '../services/notifier'
 
 const search = ref('')
 const statusFilter = ref('Tous')
 const proprietaires = ref([])
 const loading = ref(true)
+
+const newProprietaireDialog = ref(false)
+const savingProprietaire = ref(false)
+const newProprietaire = ref({
+  nom: '',
+  prenom: '',
+  cin: '',
+  telephone: '',
+  adresse: ''
+})
+
+const saveNewProprietaire = async () => {
+  if (!newProprietaire.value.nom || !newProprietaire.value.prenom || !newProprietaire.value.cin) {
+    notification.error('Veuillez remplir le prénom, le nom et la CIN')
+    return
+  }
+
+  savingProprietaire.value = true
+  try {
+    await api.proprietaires.create(newProprietaire.value)
+    notification.success('Propriétaire créé avec succès !')
+    newProprietaireDialog.value = false
+    newProprietaire.value = { nom: '', prenom: '', cin: '', telephone: '', adresse: '' }
+    await fetchProprietaires()
+  } catch (e) {
+    notification.error('Erreur lors de la création: ' + e.message)
+  } finally {
+    savingProprietaire.value = false
+  }
+}
 
 // Mocked stats since backend doesn't have aggregate endpoints yet
 const stats = ref({

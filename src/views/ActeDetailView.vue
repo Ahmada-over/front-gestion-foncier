@@ -15,13 +15,13 @@
         <v-btn variant="outlined" color="grey-darken-1" prepend-icon="mdi-printer-outline" rounded="lg" class="text-none font-weight-medium" size="small">
           Imprimer
         </v-btn>
-        <v-btn color="#0a2540" prepend-icon="mdi-download-outline" rounded="lg" elevation="0" class="text-none font-weight-medium" size="small" @click="downloadPdf" :disabled="acte.statut.toLowerCase() === 'brouillon'">
+        <v-btn color="#0a2540" prepend-icon="mdi-download-outline" rounded="lg" elevation="0" class="text-none font-weight-medium" size="small" @click="downloadPdf" :disabled="(acte.statut || '').toLowerCase() === 'brouillon'">
           Télécharger PDF
         </v-btn>
-        <v-btn v-if="acte.statut.toLowerCase() === 'brouillon'" variant="outlined" color="primary" prepend-icon="mdi-pencil" rounded="lg" class="text-none font-weight-medium" size="small" :to="`/actes/${route.params.id}/editer`">
+        <v-btn v-if="(acte.statut || '').toLowerCase() === 'brouillon'" variant="outlined" color="primary" prepend-icon="mdi-pencil" rounded="lg" class="text-none font-weight-medium" size="small" :to="`/actes/${route.params.id}/editer`">
           Éditer l'acte
         </v-btn>
-        <v-btn v-if="acte.statut.toLowerCase() === 'brouillon'" color="success" prepend-icon="mdi-check-decagram" rounded="lg" elevation="0" class="text-none font-weight-medium" size="small" :loading="validating" @click="validerActe">
+        <v-btn v-if="(acte.statut || '').toLowerCase() === 'brouillon'" color="success" prepend-icon="mdi-check-decagram" rounded="lg" elevation="0" class="text-none font-weight-medium" size="small" :loading="validating" @click="validerActe">
           Valider l'acte
         </v-btn>
       </div>
@@ -79,11 +79,11 @@
                   <div class="text-caption text-grey-darken-1">CIN : {{ acte.vendeur.cin }}</div>
                 </div>
               </div>
-              <div class="d-flex align-center text-caption text-grey-darken-1 mb-2">
+              <div class="d-flex align-center text-caption text-grey-darken-1 mb-2" v-if="acte.vendeur.telephone && acte.vendeur.telephone !== 'Non renseigné'">
                 <v-icon size="14" class="mr-2" color="grey-darken-1">mdi-phone-outline</v-icon>
                 {{ acte.vendeur.telephone }}
               </div>
-              <div class="d-flex align-center text-caption text-grey-darken-1">
+              <div class="d-flex align-center text-caption text-grey-darken-1" v-if="acte.vendeur.email && acte.vendeur.email !== 'Non renseigné'">
                 <v-icon size="14" class="mr-2" color="grey-darken-1">mdi-email-outline</v-icon>
                 {{ acte.vendeur.email }}
               </div>
@@ -107,14 +107,15 @@
                   <div class="text-caption text-grey-darken-1">CIN : {{ acte.acheteur.cin }}</div>
                 </div>
               </div>
-              <div class="d-flex align-center text-caption text-grey-darken-1 mb-2">
+              <div class="d-flex align-center text-caption text-grey-darken-1 mb-2" v-if="acte.acheteur.telephone && acte.acheteur.telephone !== 'Non renseigné'">
                 <v-icon size="14" class="mr-2" color="grey-darken-1">mdi-phone-outline</v-icon>
                 {{ acte.acheteur.telephone }}
               </div>
-              <div class="d-flex align-center text-caption text-grey-darken-1">
+              <div class="d-flex align-center text-caption text-grey-darken-1" v-if="acte.acheteur.email && acte.acheteur.email !== 'Non renseigné'">
                 <v-icon size="14" class="mr-2" color="grey-darken-1">mdi-email-outline</v-icon>
                 {{ acte.acheteur.email }}
               </div>
+
             </v-card>
           </v-col>
         </v-row>
@@ -160,14 +161,16 @@
               <tr>
                 <th class="text-overline font-weight-bold text-grey-darken-1" style="font-size: 10px !important;">NOM & PRÉNOMS</th>
                 <th class="text-overline font-weight-bold text-grey-darken-1" style="font-size: 10px !important;">RÔLE</th>
+                <th class="text-overline font-weight-bold text-grey-darken-1" style="font-size: 10px !important;">N° CIN</th>
                 <th class="text-overline font-weight-bold text-grey-darken-1" style="font-size: 10px !important;">TÉLÉPHONE</th>
                 <th class="text-overline font-weight-bold text-grey-darken-1" style="font-size: 10px !important;">SIGNATURE</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="temoin in acte.temoins" :key="temoin.nom">
+              <tr v-for="temoin in acte.temoins" :key="temoin.cin || temoin.nom">
                 <td class="font-weight-bold text-body-2 py-3" style="color: #1a3b5c;">{{ temoin.nom }}</td>
                 <td class="text-body-2 text-grey-darken-1 py-3">{{ temoin.role }}</td>
+                <td class="text-body-2 text-grey-darken-1 py-3">{{ temoin.cin }}</td>
                 <td class="text-body-2 text-grey-darken-1 py-3">{{ temoin.telephone }}</td>
                 <td class="py-3">
                   <div class="d-flex align-center text-teal-darken-2 font-weight-medium text-caption">
@@ -176,8 +179,12 @@
                   </div>
                 </td>
               </tr>
+              <tr v-if="!acte.temoins || acte.temoins.length === 0">
+                <td colspan="5" class="text-center py-4 text-caption text-grey">Aucun témoin enregistré pour cet acte.</td>
+              </tr>
             </tbody>
           </v-table>
+
         </v-card>
       </v-col>
 
@@ -279,40 +286,33 @@ const route = useRoute()
 const qrCodeUrl = ref(null)
 const validating = ref(false)
 
-// Demo data (will be replaced by API data if available)
 const acte = ref({
-  numero: 'AV-2024-0023',
-  statut: 'Validé',
-  parcelleId: 'PAR-7239-D',
-  localisation: 'Quartier Taofikh, Section C, Lot 14',
-  superficie: '450 m²',
-  typeUsage: 'Résidentiel',
-  numeroTitre: 'TF-44682-DG',
+  numero: '',
+  statut: '',
+  parcelleId: '',
+  localisation: '',
+  superficie: '',
+  typeUsage: '',
+  numeroTitre: '',
   vendeur: {
-    nom: 'Moussa DIAGNE',
-    cin: '1 702 1985 00034',
-    telephone: '+221 77 555 12 34',
-    email: 'm.diagne@email.sn',
+    nom: '',
+    cin: '',
+    telephone: '',
+    email: '',
     avatar: ''
   },
   acheteur: {
-    nom: 'Awa SOW',
-    cin: '2 509 1982 01844',
-    telephone: '+221 78 443 00 11',
-    email: 'awa.sow@business.sn',
+    nom: '',
+    cin: '',
+    telephone: '',
+    email: '',
     avatar: ''
   },
-  montant: '15,000,000',
-  dateSignature: '01 Avril 2024',
-  modePaiement: 'Virement Bancaire',
-  temoins: [
-    { nom: 'Ibrahima FALL', role: 'Témoin Vendeur', telephone: '+221 70 123 45 67' },
-    { nom: 'Fatou MBAYE', role: 'Témoin Acheteur', telephone: '+221 76 987 65 43' }
-  ],
-  historique: [
-    { titre: 'Acte Validé', auteur: 'Modou Fall (Admin)', date: '02/04/2024 — 14:30', color: 'primary' },
-    { titre: 'Acte Créé', auteur: 'Modou Fall (Agent)', date: '01/04/2024 — 09:15', color: 'grey-lighten-2' }
-  ]
+  montant: '0',
+  dateSignature: '',
+  modePaiement: 'Comptant',
+  temoins: [],
+  historique: []
 })
 
 const fetchActe = async () => {
@@ -323,35 +323,76 @@ const fetchActe = async () => {
     const data = await api.actes.getById(acteId)
     if (data) {
       acte.value = {
-        ...acte.value,
-        numero: data.numero_acte || acte.value.numero,
-        statut: data.statut || acte.value.statut,
-        parcelleId: data.numero_parcelle || acte.value.parcelleId,
-        montant: data.montant ? new Intl.NumberFormat('fr-FR').format(data.montant) : acte.value.montant,
-        dateSignature: data.date_vente ? new Date(data.date_vente).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }) : acte.value.dateSignature,
+        numero: data.numero_acte || '',
+        statut: data.statut || 'brouillon',
+        parcelleId: data.numero_parcelle || data.numero_parcelle_info || 'Non renseigné',
+        localisation: data.localisation || data.parcelle?.localisation || 'Non renseignée',
+        superficie: data.superficie_m2 ? `${data.superficie_m2} m²` : (data.parcelle?.superficie_m2 ? `${data.parcelle.superficie_m2} m²` : 'Non renseignée'),
+        typeUsage: data.type_usage || data.parcelle?.description || 'Habitation',
+        numeroTitre: data.numero_parcelle ? `TF-${data.numero_parcelle.replace(/[^0-9]/g, '') || '00'}-TB` : 'N/A',
+        montant: data.montant_cfa !== undefined && data.montant_cfa !== null ? new Intl.NumberFormat('fr-FR').format(data.montant_cfa) : '0',
+        dateSignature: data.date_vente ? new Date(data.date_vente + 'T00:00:00').toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }) : '-',
+        modePaiement: 'Comptant',
         vendeur: {
-          nom: `${data.vendeur_prenom || ''} ${data.vendeur_nom || ''}`.trim() || acte.value.vendeur.nom,
-          cin: data.vendeur_cin || acte.value.vendeur.cin,
-          telephone: data.vendeur_telephone || acte.value.vendeur.telephone,
-          email: data.vendeur_email || acte.value.vendeur.email,
+          nom: `${data.vendeur_prenom || ''} ${data.vendeur_nom || ''}`.trim() || 'Non renseigné',
+          cin: data.vendeur_cin || 'Non renseigné',
+          telephone: data.vendeur_telephone || 'Non renseigné',
+          email: data.vendeur_email || 'Non renseigné',
           avatar: ''
         },
         acheteur: {
-          nom: `${data.acheteur_prenom || ''} ${data.acheteur_nom || ''}`.trim() || acte.value.acheteur.nom,
-          cin: data.acheteur_cin || acte.value.acheteur.cin,
-          telephone: data.acheteur_telephone || acte.value.acheteur.telephone,
-          email: data.acheteur_email || acte.value.acheteur.email,
+          nom: `${data.acheteur_prenom || ''} ${data.acheteur_nom || ''}`.trim() || 'Non renseigné',
+          cin: data.acheteur_cin || 'Non renseigné',
+          telephone: data.acheteur_telephone || 'Non renseigné',
+          email: data.acheteur_email || 'Non renseigné',
           avatar: ''
         },
         temoins: data.temoins && data.temoins.length > 0
           ? data.temoins.map(t => ({
               nom: `${t.prenom || ''} ${t.nom || ''}`.trim(),
+              cin: t.cin || '-',
               role: 'Témoin',
               telephone: t.telephone || '-'
             }))
-          : acte.value.temoins
+          : [],
+        historique: []
+      }
+
+      // Fetch real audit trail history for this Acte
+      try {
+        const logs = await api.historique.getAll(0, 100, 'actes_vente')
+        const acteLogs = logs.filter(l => l.enregistrement_id === acteId)
+        if (acteLogs.length > 0) {
+          acte.value.historique = acteLogs.map(l => {
+            let label = 'Acte Modifié'
+            let color = 'warning'
+            if (l.action === 'creation') { label = 'Acte Créé (Brouillon)'; color = 'blue-darken-2' }
+            else if (l.action === 'validation') { label = 'Acte Validé & Certifié'; color = 'success' }
+            else if (l.action === 'annulation') { label = 'Acte Annulé'; color = 'error' }
+            
+            return {
+              titre: label,
+              auteur: l.utilisateur_nom || 'Utilisateur',
+              date: new Date(l.created_at).toLocaleDateString('fr-FR') + ' — ' + new Date(l.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+              color: color
+            }
+          })
+        } else {
+          acte.value.historique = [
+            {
+              titre: data.statut === 'valide' ? 'Acte Validé & Certifié' : 'Acte Créé (Brouillon)',
+              auteur: 'Agent Foncier',
+              date: new Date(data.created_at || data.date_vente).toLocaleDateString('fr-FR'),
+              color: data.statut === 'valide' ? 'success' : 'blue-darken-2'
+            }
+          ]
+        }
+      } catch (e) {
+        console.warn("Historique non disponible:", e)
       }
     }
+
+
     // Fetch QR code unconditionally
     try {
       qrCodeUrl.value = await api.actes.getQrcodeImage(acteId)
@@ -363,6 +404,7 @@ const fetchActe = async () => {
     console.error("Erreur lors de la récupération de l'acte:", error)
   }
 }
+
 
 onMounted(() => {
   fetchActe()

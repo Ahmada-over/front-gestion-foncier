@@ -17,3 +17,8 @@ export const notify = {
     notification.value = { show: true, message: msg, color: 'info' }
   }
 }
+
+// Attach helper methods to notification object for backward compatibility
+notification.success = notify.success
+notification.error = notify.error
+notification.info = notify.info

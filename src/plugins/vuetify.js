@@ -7,16 +7,27 @@ export default createVuetify({
     defaultTheme: 'light',
     themes: {
       light: {
+        dark: false,
         colors: {
-          primary: '#1976D2',
-          secondary: '#424242',
-          accent: '#82B1FF',
-          error: '#FF5252',
-          info: '#2196F3',
-          success: '#4CAF50',
-          warning: '#FFC107',
+          primary: '#0f2942',
+          secondary: '#1b4965',
+          accent: '#3b82f6',
+          success: '#10b981',
+          warning: '#f59e0b',
+          error: '#ef4444',
+          info: '#0284c7',
+          background: '#f8fafc',
+          surface: '#ffffff'
         }
-      },
-    },
+      }
+    }
   },
+  defaults: {
+    VCard: {
+      elevation: 0
+    },
+    VBtn: {
+      elevation: 0
+    }
+  }
 })

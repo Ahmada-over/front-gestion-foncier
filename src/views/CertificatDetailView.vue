@@ -23,10 +23,10 @@
         <v-btn variant="outlined" color="grey-darken-1" prepend-icon="mdi-printer-outline" rounded="lg" class="text-none font-weight-medium" size="small">
           Imprimer
         </v-btn>
-        <v-btn v-if="cert.statut.toLowerCase() === 'brouillon'" color="success" prepend-icon="mdi-check-decagram" rounded="lg" elevation="0" class="text-none font-weight-medium" size="small" @click="validerCertificat" :loading="validating">
+        <v-btn v-if="(cert.statut || '').toLowerCase() === 'brouillon'" color="success" prepend-icon="mdi-check-decagram" rounded="lg" elevation="0" class="text-none font-weight-medium" size="small" @click="validerCertificat" :loading="validating">
           Valider le certificat
         </v-btn>
-        <v-btn v-else-if="cert.statut.toLowerCase() === 'actif'" color="#0a2540" prepend-icon="mdi-download-outline" rounded="lg" elevation="0" class="text-none font-weight-medium" size="small" @click="downloadPdf">
+        <v-btn v-else color="#0a2540" prepend-icon="mdi-download-outline" rounded="lg" elevation="0" class="text-none font-weight-medium" size="small" @click="downloadPdf">
           Télécharger PDF
         </v-btn>
       </div>
@@ -55,52 +55,78 @@
           <v-divider class="mb-6"></v-divider>
 
           <v-row>
-            <v-col cols="12" sm="4">
+            <v-col cols="12" sm="4" v-if="cert.titulaire.telephone">
               <div class="text-overline text-grey-darken-1 font-weight-bold mb-1" style="font-size: 10px !important;">TÉLÉPHONE</div>
-              <div class="text-body-2 font-weight-medium text-grey-darken-3">{{ cert.titulaire.telephone || 'Non renseigné' }}</div>
+              <div class="text-body-2 font-weight-medium text-grey-darken-3">{{ cert.titulaire.telephone }}</div>
             </v-col>
-            <v-col cols="12" sm="8">
+            <v-col cols="12" sm="8" v-if="cert.titulaire.adresse">
               <div class="text-overline text-grey-darken-1 font-weight-bold mb-1" style="font-size: 10px !important;">ADRESSE DE RÉSIDENCE</div>
-              <div class="text-body-2 font-weight-medium text-grey-darken-3">{{ cert.titulaire.adresse || 'Village de Taofikh Bousso' }}</div>
+              <div class="text-body-2 font-weight-medium text-grey-darken-3">{{ cert.titulaire.adresse }}</div>
             </v-col>
           </v-row>
         </v-card>
 
         <!-- Information sur la Parcelle -->
-        <v-card elevation="0" border rounded="xl" class="pa-6">
+        <v-card elevation="0" border rounded="xl" class="pa-6 mb-6">
           <div class="d-flex justify-space-between align-center mb-6">
             <div class="d-flex align-center">
               <v-icon color="primary" class="mr-3" size="20">mdi-map-marker-outline</v-icon>
-              <h2 class="text-subtitle-1 font-weight-bold" style="color: #1a3b5c;">Localisation de la parcelle</h2>
+              <h2 class="text-subtitle-1 font-weight-bold" style="color: #1a3b5c;">Localisation et données de la parcelle</h2>
             </div>
             <v-chip color="blue-lighten-5" text-color="primary" class="font-weight-bold text-caption" size="small">{{ cert.parcelle.numero }}</v-chip>
           </div>
 
           <v-row>
-            <v-col cols="6" sm="3">
+            <v-col cols="6" sm="4">
+              <div class="text-overline text-grey-darken-1 font-weight-bold mb-1" style="font-size: 10px !important;">LOCALISATION</div>
+              <div class="text-body-2 font-weight-medium text-grey-darken-3">{{ cert.parcelle.localisation }}</div>
+            </v-col>
+            <v-col cols="6" sm="4">
               <div class="text-overline text-grey-darken-1 font-weight-bold mb-1" style="font-size: 10px !important;">SUPERFICIE</div>
               <div class="text-body-2 font-weight-medium text-grey-darken-3">{{ cert.parcelle.superficie }}</div>
             </v-col>
-            <v-col cols="6" sm="3">
-              <div class="text-overline text-grey-darken-1 font-weight-bold mb-1" style="font-size: 10px !important;">USAGE</div>
+            <v-col cols="6" sm="4">
+              <div class="text-overline text-grey-darken-1 font-weight-bold mb-1" style="font-size: 10px !important;">TYPE D'USAGE</div>
               <div class="text-body-2 font-weight-medium text-grey-darken-3">{{ cert.parcelle.usage }}</div>
             </v-col>
-            <v-col cols="6" sm="3">
-              <div class="text-overline text-grey-darken-1 font-weight-bold mb-1" style="font-size: 10px !important;">LATITUDE</div>
-              <div class="text-body-2 font-weight-medium text-grey-darken-3">14.7561° N</div>
-            </v-col>
-            <v-col cols="6" sm="3">
-              <div class="text-overline text-grey-darken-1 font-weight-bold mb-1" style="font-size: 10px !important;">LONGITUDE</div>
-              <div class="text-body-2 font-weight-medium text-grey-darken-3">17.4677° W</div>
-            </v-col>
           </v-row>
-          
-          <div class="mt-6 rounded-xl overflow-hidden border" style="height: 200px; background: #f5f5f5;">
-            <!-- Placeholder for Map -->
-            <div class="d-flex align-center justify-center h-100" style="background: linear-gradient(135deg, #e3f2fd 0%, #f1f8e9 100%);">
-               <v-icon size="48" color="grey-lighten-1">mdi-map-search-outline</v-icon>
-            </div>
+        </v-card>
+
+        <!-- Témoins du certificat -->
+        <v-card elevation="0" border rounded="xl" class="pa-6">
+          <div class="d-flex align-center mb-5">
+            <v-icon color="primary" class="mr-3" size="20">mdi-account-group-outline</v-icon>
+            <h2 class="text-subtitle-1 font-weight-bold" style="color: #1a3b5c;">Témoins du certificat</h2>
           </div>
+
+          <v-table density="comfortable">
+            <thead>
+              <tr>
+                <th class="text-overline font-weight-bold text-grey-darken-1" style="font-size: 10px !important;">NOM & PRÉNOMS</th>
+                <th class="text-overline font-weight-bold text-grey-darken-1" style="font-size: 10px !important;">RÔLE</th>
+                <th class="text-overline font-weight-bold text-grey-darken-1" style="font-size: 10px !important;">N° CIN</th>
+                <th class="text-overline font-weight-bold text-grey-darken-1" style="font-size: 10px !important;">TÉLÉPHONE</th>
+                <th class="text-overline font-weight-bold text-grey-darken-1" style="font-size: 10px !important;">SIGNATURE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="temoin in cert.temoins" :key="temoin.cin || temoin.nom">
+                <td class="font-weight-bold text-body-2 py-3" style="color: #1a3b5c;">{{ temoin.nom }}</td>
+                <td class="text-body-2 text-grey-darken-1 py-3">Témoin</td>
+                <td class="text-body-2 text-grey-darken-1 py-3">{{ temoin.cin }}</td>
+                <td class="text-body-2 text-grey-darken-1 py-3">{{ temoin.telephone }}</td>
+                <td class="py-3">
+                  <div class="d-flex align-center text-teal-darken-2 font-weight-medium text-caption">
+                    <v-icon size="14" class="mr-1" color="teal-darken-2">mdi-check-circle</v-icon>
+                    Signé
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="!cert.temoins || cert.temoins.length === 0">
+                <td colspan="5" class="text-center py-4 text-caption text-grey">Aucun témoin enregistré pour ce certificat.</td>
+              </tr>
+            </tbody>
+          </v-table>
         </v-card>
       </v-col>
 
@@ -135,20 +161,15 @@
             Générer le QR Code
           </v-btn>
           <v-btn v-else block variant="tonal" color="primary" size="small" class="text-none font-weight-bold" prepend-icon="mdi-shield-check-outline">
-            Vérifier sur la Blockchain
+            Certificat Vérifié
           </v-btn>
         </v-card>
 
         <!-- Dates Clés -->
-        <v-card elevation="0" border rounded="xl" class="pa-6">
+        <v-card elevation="0" border rounded="xl" class="pa-6 mb-6">
           <div class="d-flex align-center mb-4">
             <v-icon color="orange-darken-2" class="mr-3" size="20">mdi-calendar-clock</v-icon>
             <h3 class="text-subtitle-2 font-weight-bold" style="color: #1a3b5c;">Validité du titre</h3>
-          </div>
-          
-          <div class="mb-4">
-            <div class="text-caption text-grey-darken-1 mb-1">Délivré par</div>
-            <div class="text-body-2 font-weight-bold">Conservateur Foncier — Zone Nord</div>
           </div>
 
           <div class="d-flex justify-space-between mb-2">
@@ -159,10 +180,27 @@
             <div class="text-caption text-grey-darken-1">Expiration</div>
             <div class="text-caption font-weight-bold text-error">{{ cert.dateExpiration }}</div>
           </div>
+        </v-card>
 
-          <v-alert v-if="isNearExpiration" color="warning" variant="tonal" density="compact" class="text-caption">
-            Ce titre arrive à expiration dans moins de 30 jours.
-          </v-alert>
+        <!-- Historique de délivrance -->
+        <v-card elevation="0" border rounded="xl" class="pa-6">
+          <div class="d-flex align-center mb-4">
+            <v-icon color="primary" class="mr-3" size="20">mdi-history</v-icon>
+            <h3 class="text-subtitle-2 font-weight-bold" style="color: #1a3b5c;">Historique d'audit</h3>
+          </div>
+
+          <v-timeline density="compact" align="start" class="px-0">
+            <v-timeline-item
+              v-for="(item, i) in cert.historique"
+              :key="i"
+              :dot-color="item.color || 'primary'"
+              size="x-small"
+            >
+              <div class="text-caption font-weight-bold" style="color: #1a3b5c;">{{ item.titre }}</div>
+              <div class="text-caption text-grey-darken-1">{{ item.auteur }}</div>
+              <div class="text-caption text-grey" style="font-size: 10px !important;">{{ item.date }}</div>
+            </v-timeline-item>
+          </v-timeline>
         </v-card>
       </v-col>
     </v-row>
@@ -170,7 +208,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { api } from '../services/api'
 import { notify } from '../services/notifier'
@@ -181,12 +219,14 @@ const loading = ref(false)
 const validating = ref(false)
 
 const cert = ref({
-  numero: '...',
-  statut: '...',
-  dateDelivrance: '...',
-  dateExpiration: '...',
-  titulaire: { nom: '...', cin: '...', telephone: '', adresse: '' },
-  parcelle: { numero: '...', superficie: '...', usage: '...' }
+  numero: '',
+  statut: '',
+  dateDelivrance: '',
+  dateExpiration: '',
+  titulaire: { nom: '', cin: '', telephone: '', adresse: '' },
+  parcelle: { numero: '', superficie: '', usage: '', localisation: '' },
+  temoins: [],
+  historique: []
 })
 
 const fetchCertificat = async () => {
@@ -198,24 +238,66 @@ const fetchCertificat = async () => {
     const data = await api.certificats.getById(certId)
     if (data) {
       cert.value = {
-        numero: data.numero_certificat || `CO-${data.id.substring(0, 8)}`,
-        statut: data.statut || 'Actif',
-        dateDelivrance: data.date_delivrance ? new Date(data.date_delivrance).toLocaleDateString('fr-FR') : '-',
-        dateExpiration: data.date_expiration ? new Date(data.date_expiration).toLocaleDateString('fr-FR') : '-',
+        numero: data.numero_certificat || '',
+        statut: data.statut || 'brouillon',
+        dateDelivrance: data.date_delivrance ? new Date(data.date_delivrance + 'T00:00:00').toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }) : '-',
+        dateExpiration: data.date_expiration ? new Date(data.date_expiration + 'T00:00:00').toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }) : '-',
         titulaire: {
-          nom: `${data.prenom_titulaire || ''} ${data.nom_titulaire || ''}`.trim(),
-          cin: data.cin_titulaire || '-',
+          nom: `${data.prenom_titulaire || ''} ${data.nom_titulaire || ''}`.trim() || 'Non renseigné',
+          cin: data.cin_titulaire || 'Non renseigné',
           telephone: data.telephone_titulaire || '',
           adresse: data.adresse_titulaire || ''
         },
         parcelle: {
-          numero: data.numero_parcelle || '-',
-          superficie: data.superficie_m2 ? `${data.superficie_m2} m²` : '-',
-          usage: data.type_usage || 'Résidentiel'
-        }
+          numero: data.numero_parcelle || 'Non renseigné',
+          superficie: data.superficie_m2 ? `${data.superficie_m2} m²` : 'Non renseignée',
+          usage: data.type_usage || 'Habitation',
+          localisation: data.localisation || 'Non renseignée'
+        },
+        temoins: data.temoins && data.temoins.length > 0
+          ? data.temoins.map(t => ({
+              nom: `${t.prenom || ''} ${t.nom || ''}`.trim(),
+              cin: t.cin || '-',
+              telephone: t.telephone || '-'
+            }))
+          : [],
+        historique: []
       }
       
-      // Fetch QR code unconditionally. If it fails, it means it's not generated yet.
+      // Fetch real audit trail history
+      try {
+        const logs = await api.historique.getAll(0, 100, 'certificats_occupation')
+        const certLogs = logs.filter(l => l.enregistrement_id === certId)
+        if (certLogs.length > 0) {
+          cert.value.historique = certLogs.map(l => {
+            let label = 'Certificat Modifié'
+            let color = 'warning'
+            if (l.action === 'creation') { label = 'Certificat Enregistré (Brouillon)'; color = 'blue-darken-2' }
+            else if (l.action === 'validation') { label = 'Certificat Validé & Actif'; color = 'success' }
+            else if (l.action === 'annulation') { label = 'Certificat Révoqué'; color = 'error' }
+            
+            return {
+              titre: label,
+              auteur: l.utilisateur_nom || 'Utilisateur',
+              date: new Date(l.created_at).toLocaleDateString('fr-FR') + ' — ' + new Date(l.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+              color: color
+            }
+          })
+        } else {
+          cert.value.historique = [
+            {
+              titre: data.statut === 'actif' ? 'Certificat Validé & Actif' : 'Certificat Enregistré (Brouillon)',
+              auteur: 'Agent Foncier',
+              date: new Date(data.created_at || data.date_delivrance).toLocaleDateString('fr-FR'),
+              color: data.statut === 'actif' ? 'success' : 'blue-darken-2'
+            }
+          ]
+        }
+      } catch (e) {
+        console.warn("Historique non disponible:", e)
+      }
+
+      // Fetch QR code unconditionally
       try {
         qrCodeUrl.value = await api.certificats.getQrcodeImage(certId)
       } catch (e) {
@@ -248,11 +330,6 @@ const validerEtGenererQR = async () => {
   }
 }
 
-const isNearExpiration = computed(() => {
-  // Demo logic
-  return false
-})
-
 const getInitials = (name) => {
   if (!name || name === '...') return '?'
   const parts = name.split(' ')
@@ -281,18 +358,13 @@ const validerCertificat = async () => {
   const certId = route.params.id
   if (!certId) return
   
-  if (!confirm('Êtes-vous sûr de vouloir valider ce certificat ? Cette action est irréversible et générera le QR Code officiel.')) {
-    return
-  }
-  
   validating.value = true
   try {
     await api.certificats.valider(certId)
-    // Reload
+    notify.success("Certificat validé et QR code généré avec succès")
     await fetchCertificat()
   } catch (e) {
-    console.error(e)
-    alert("Erreur lors de la validation")
+    notify.error("Erreur lors de la validation: " + (e.response?.data?.detail || e.message))
   } finally {
     validating.value = false
   }

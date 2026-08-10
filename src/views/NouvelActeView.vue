@@ -1,17 +1,22 @@
 <template>
-  <div class="pb-16"> <!-- Padding bottom for sticky footer -->
+  <div class="pb-16">
     <!-- Header -->
     <div class="mb-6">
-      <v-btn variant="text" prepend-icon="mdi-arrow-left" color="primary" class="px-0 text-none font-weight-bold text-caption" to="/actes">
-        RETOUR À LA LISTE
+      <v-btn variant="text" prepend-icon="mdi-arrow-left" color="primary" class="px-0 text-none font-weight-bold text-caption mb-1" to="/actes">
+        RETOUR À LA LISTE DES ACTES
       </v-btn>
-      <div class="d-flex justify-space-between align-center mt-2">
-        <h1 class="text-h5 font-weight-bold" style="color: #1a3b5c;">Nouvel acte de vente</h1>
-        <div class="d-flex align-center bg-white border px-4 py-2 rounded-lg">
-          <v-icon color="success" size="small" class="mr-2">mdi-check-circle</v-icon>
+      <div class="d-flex justify-space-between align-center">
+        <div>
+          <h1 class="text-h5 font-weight-bold" style="color: #0f2942;">Nouvel acte de vente</h1>
+          <div class="text-caption text-grey-darken-1">Renseignez la parcelle, le vendeur, l'acheteur et les témoins.</div>
+        </div>
+        <div class="d-flex align-center bg-white border px-4 py-2 rounded-xl shadow-xs">
+          <v-avatar color="amber-lighten-5" size="28" class="mr-2">
+            <v-icon color="warning" size="16">mdi-pencil</v-icon>
+          </v-avatar>
           <div>
-            <div class="text-caption text-grey-darken-1 font-weight-bold" style="line-height: 1;">STATUT ACTUEL</div>
-            <div class="text-body-2 font-weight-bold" style="line-height: 1.2;">Nouveau brouillon</div>
+            <div class="text-caption text-grey-darken-1 font-weight-bold" style="line-height: 1; font-size: 10px;">STATUT</div>
+            <div class="text-caption font-weight-bold text-warning" style="line-height: 1.2;">Brouillon</div>
           </div>
         </div>
       </div>
@@ -21,15 +26,17 @@
       <!-- Left Column -->
       <v-col cols="12" md="8">
         <!-- Informations de la parcelle -->
-        <v-card elevation="0" border rounded="xl" class="pa-6 mb-6">
+        <v-card elevation="0" border rounded="xl" class="pa-6 mb-6 bg-white">
           <div class="d-flex align-center mb-6">
-            <v-icon color="primary" class="mr-3">mdi-map-marker-outline</v-icon>
-            <h2 class="text-subtitle-1 font-weight-bold" style="color: #1a3b5c;">Informations de la parcelle</h2>
+            <v-avatar color="blue-lighten-5" size="36" class="mr-3">
+              <v-icon color="primary" size="20">mdi-map-marker-radius-outline</v-icon>
+            </v-avatar>
+            <h2 class="text-subtitle-1 font-weight-bold" style="color: #0f2942;">Informations de la parcelle</h2>
           </div>
           
           <v-row>
             <v-col cols="12" sm="8">
-              <div class="text-caption font-weight-medium text-grey-darken-1 mb-1">N° de parcelle</div>
+              <div class="text-caption font-weight-bold text-grey-darken-1 mb-1">RECHERCHER N° PARCELLE *</div>
               <v-text-field
                 v-model="parcelleSearch"
                 placeholder="Ex: TB-2024-045"
@@ -42,12 +49,12 @@
                 @keyup.enter="lookupParcelle"
                 :loading="searchingParcelle"
               ></v-text-field>
-              <div v-if="resolvedParcelle" class="text-caption text-success font-weight-bold mt-1">
-                <v-icon size="14">mdi-check-circle</v-icon> {{ resolvedParcelle.numero_parcelle }} - {{ resolvedParcelle.superficie_m2 }}m²
+              <div v-if="resolvedParcelle" class="text-caption text-success font-weight-bold mt-2 d-flex align-center">
+                <v-icon size="16" class="mr-1">mdi-check-circle</v-icon> Parcelle identifiée: {{ resolvedParcelle.numero_parcelle }} ({{ resolvedParcelle.superficie_m2 }} m²)
               </div>
             </v-col>
             <v-col cols="12" sm="4">
-              <div class="text-caption font-weight-medium text-grey-darken-1 mb-1">Superficie</div>
+              <div class="text-caption font-weight-bold text-grey-darken-1 mb-1">SUPERFICIE</div>
               <v-text-field
                 v-model="acte.superficie"
                 placeholder="200 m²"
@@ -55,21 +62,21 @@
                 density="comfortable"
                 hide-details
                 rounded="lg"
-                bg-color="grey-lighten-4"
+                bg-color="slate-50"
                 readonly
               ></v-text-field>
             </v-col>
             <v-col cols="12">
-              <div class="text-caption font-weight-medium text-grey-darken-1 mb-1">Localisation</div>
+              <div class="text-caption font-weight-bold text-grey-darken-1 mb-1">LOCALISATION</div>
               <v-text-field
                 v-model="acte.localisation"
                 prepend-inner-icon="mdi-map-marker-outline"
-                placeholder="Quartier Darou"
+                placeholder="Quartier / Village"
                 variant="outlined"
                 density="comfortable"
                 hide-details
                 rounded="lg"
-                bg-color="grey-lighten-4"
+                bg-color="slate-50"
                 readonly
               ></v-text-field>
             </v-col>
@@ -80,13 +87,15 @@
         <v-row class="mb-6">
           <!-- Vendeur -->
           <v-col cols="12" sm="6">
-            <v-card elevation="0" border rounded="xl" class="pa-6 h-100 bg-blue-grey-lighten-5">
+            <v-card elevation="0" border rounded="xl" class="pa-6 h-100 bg-slate-50">
               <div class="d-flex align-center mb-6">
-                <v-icon color="primary" class="mr-3">mdi-account-outline</v-icon>
-                <h2 class="text-subtitle-1 font-weight-bold" style="color: #1a3b5c;">Vendeur</h2>
+                <v-avatar color="indigo-lighten-5" size="36" class="mr-3">
+                  <v-icon color="indigo-darken-2" size="20">mdi-account-arrow-right-outline</v-icon>
+                </v-avatar>
+                <h2 class="text-subtitle-1 font-weight-bold" style="color: #0f2942;">Vendeur</h2>
               </div>
               
-              <div class="text-caption font-weight-medium text-grey-darken-1 mb-1">CIN (Carte d'Identité)</div>
+              <div class="text-caption font-weight-bold text-grey-darken-1 mb-1">N° CIN VENDEUR *</div>
               <v-text-field 
                 v-model="vendeurCin" 
                 variant="outlined" 
@@ -94,7 +103,7 @@
                 hide-details 
                 rounded="lg" 
                 class="bg-white mb-2"
-                placeholder="Rechercher par CIN"
+                placeholder="Ex: 1990123456789"
                 append-inner-icon="mdi-magnify"
                 @click:append-inner="lookupVendeur"
                 @keyup.enter="lookupVendeur"
@@ -102,16 +111,17 @@
               ></v-text-field>
 
               <v-expand-transition>
-                <div v-if="resolvedVendeur" class="bg-white pa-3 rounded-lg border mt-2">
-                  <div class="font-weight-bold text-body-2" style="color: #1a3b5c;">{{ resolvedVendeur.prenom }} {{ resolvedVendeur.nom }}</div>
-                  <div class="text-caption text-grey-darken-1">{{ resolvedVendeur.adresse || 'Sans adresse' }}</div>
+                <div v-if="resolvedVendeur" class="bg-white pa-4 rounded-xl border mt-3 shadow-xs">
+                  <div class="font-weight-bold text-body-2" style="color: #0f2942;">{{ resolvedVendeur.prenom }} {{ resolvedVendeur.nom }}</div>
+                  <div class="text-caption text-grey-darken-1">CIN : {{ resolvedVendeur.cin }}</div>
+                  <div v-if="resolvedVendeur.telephone" class="text-caption text-grey-darken-1">Tél : {{ resolvedVendeur.telephone }}</div>
                 </div>
-                <div v-else-if="vendeurNotFound" class="mt-2">
-                  <v-alert color="warning" variant="tonal" density="compact" class="text-caption mb-2">
-                    Vendeur introuvable.
+                <div v-else-if="vendeurNotFound" class="mt-3">
+                  <v-alert color="amber-lighten-5" variant="flat" density="compact" class="text-caption mb-2 text-warning rounded-lg border">
+                    Aucun propriétaire enregistré avec cette CIN.
                   </v-alert>
-                  <v-btn size="small" variant="outlined" color="primary" block @click="openNewProprietaireDialog('vendeur')">
-                    <v-icon class="mr-1">mdi-account-plus</v-icon> Créer ce vendeur
+                  <v-btn size="small" variant="outlined" color="primary" block rounded="lg" class="text-none font-weight-bold" @click="openNewProprietaireDialog('vendeur')">
+                    <v-icon class="mr-1">mdi-account-plus</v-icon> Enregistrer ce vendeur
                   </v-btn>
                 </div>
               </v-expand-transition>
@@ -120,13 +130,15 @@
 
           <!-- Acheteur -->
           <v-col cols="12" sm="6">
-            <v-card elevation="0" border rounded="xl" class="pa-6 h-100 bg-teal-lighten-5">
+            <v-card elevation="0" border rounded="xl" class="pa-6 h-100 bg-emerald-50" style="background-color: #f0fdf4 !important;">
               <div class="d-flex align-center mb-6">
-                <v-icon color="teal-darken-2" class="mr-3">mdi-account-plus-outline</v-icon>
-                <h2 class="text-subtitle-1 font-weight-bold" style="color: #004d40;">Acheteur</h2>
+                <v-avatar color="green-lighten-4" size="36" class="mr-3">
+                  <v-icon color="green-darken-3" size="20">mdi-account-arrow-left-outline</v-icon>
+                </v-avatar>
+                <h2 class="text-subtitle-1 font-weight-bold" style="color: #064e3b;">Acheteur</h2>
               </div>
 
-              <div class="text-caption font-weight-medium text-grey-darken-1 mb-1">CIN (Carte d'Identité)</div>
+              <div class="text-caption font-weight-bold text-grey-darken-1 mb-1">N° CIN ACHETEUR *</div>
               <v-text-field 
                 v-model="acheteurCin" 
                 variant="outlined" 
@@ -134,7 +146,7 @@
                 hide-details 
                 rounded="lg" 
                 class="bg-white mb-2"
-                placeholder="Rechercher par CIN"
+                placeholder="Ex: 1992987654321"
                 append-inner-icon="mdi-magnify"
                 @click:append-inner="lookupAcheteur"
                 @keyup.enter="lookupAcheteur"
@@ -142,16 +154,17 @@
               ></v-text-field>
 
               <v-expand-transition>
-                <div v-if="resolvedAcheteur" class="bg-white pa-3 rounded-lg border mt-2">
-                  <div class="font-weight-bold text-body-2" style="color: #004d40;">{{ resolvedAcheteur.prenom }} {{ resolvedAcheteur.nom }}</div>
-                  <div class="text-caption text-grey-darken-1">{{ resolvedAcheteur.adresse || 'Sans adresse' }}</div>
+                <div v-if="resolvedAcheteur" class="bg-white pa-4 rounded-xl border mt-3 shadow-xs">
+                  <div class="font-weight-bold text-body-2 text-emerald-900" style="color: #064e3b;">{{ resolvedAcheteur.prenom }} {{ resolvedAcheteur.nom }}</div>
+                  <div class="text-caption text-grey-darken-1">CIN : {{ resolvedAcheteur.cin }}</div>
+                  <div v-if="resolvedAcheteur.telephone" class="text-caption text-grey-darken-1">Tél : {{ resolvedAcheteur.telephone }}</div>
                 </div>
-                <div v-else-if="acheteurNotFound" class="mt-2">
-                  <v-alert color="warning" variant="tonal" density="compact" class="text-caption mb-2">
-                    Acheteur introuvable.
+                <div v-else-if="acheteurNotFound" class="mt-3">
+                  <v-alert color="amber-lighten-5" variant="flat" density="compact" class="text-caption mb-2 text-warning rounded-lg border">
+                    Aucun propriétaire enregistré avec cette CIN.
                   </v-alert>
-                  <v-btn size="small" variant="outlined" color="teal-darken-2" block @click="openNewProprietaireDialog('acheteur')">
-                    <v-icon class="mr-1">mdi-account-plus</v-icon> Créer cet acheteur
+                  <v-btn size="small" variant="outlined" color="success" block rounded="lg" class="text-none font-weight-bold" @click="openNewProprietaireDialog('acheteur')">
+                    <v-icon class="mr-1">mdi-account-plus</v-icon> Enregistrer cet acheteur
                   </v-btn>
                 </div>
               </v-expand-transition>
@@ -160,13 +173,15 @@
         </v-row>
 
         <!-- Témoins -->
-        <v-card elevation="0" border rounded="xl" class="pa-6">
+        <v-card elevation="0" border rounded="xl" class="pa-6 bg-white">
           <div class="d-flex justify-space-between align-center mb-6">
             <div class="d-flex align-center">
-              <v-icon color="primary" class="mr-3">mdi-account-group-outline</v-icon>
-              <h2 class="text-subtitle-1 font-weight-bold" style="color: #1a3b5c;">Témoins</h2>
+              <v-avatar color="purple-lighten-5" size="36" class="mr-3">
+                <v-icon color="purple-darken-2" size="20">mdi-account-group-outline</v-icon>
+              </v-avatar>
+              <h2 class="text-subtitle-1 font-weight-bold" style="color: #0f2942;">Témoins de la transaction</h2>
             </div>
-            <v-chip size="small" color="grey-lighten-2" text-color="grey-darken-3" class="font-weight-bold">3 REQUIS</v-chip>
+            <v-chip size="small" color="purple-lighten-5" class="font-weight-bold text-purple-darken-2" variant="flat">3 REQUIS</v-chip>
           </div>
           
           <v-table density="comfortable" class="bg-transparent">
@@ -174,14 +189,16 @@
               <tr>
                 <th class="text-overline font-weight-bold text-grey-darken-1">PRÉNOM</th>
                 <th class="text-overline font-weight-bold text-grey-darken-1">NOM</th>
-                <th class="text-overline font-weight-bold text-grey-darken-1">CIN</th>
+                <th class="text-overline font-weight-bold text-grey-darken-1">N° CIN</th>
+                <th class="text-overline font-weight-bold text-grey-darken-1">N° TÉLÉPHONE</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(temoin, index) in acte.temoins" :key="index">
-                <td class="py-2"><v-text-field v-model="temoin.prenom" :placeholder="`Prénom ${index + 1}`" variant="outlined" density="compact" hide-details bg-color="grey-lighten-4" rounded="lg"></v-text-field></td>
-                <td class="py-2"><v-text-field v-model="temoin.nom" :placeholder="`Nom ${index + 1}`" variant="outlined" density="compact" hide-details bg-color="grey-lighten-4" rounded="lg"></v-text-field></td>
-                <td class="py-2"><v-text-field v-model="temoin.cin" placeholder="0000 0000 00000" variant="outlined" density="compact" hide-details bg-color="grey-lighten-4" rounded="lg"></v-text-field></td>
+                <td class="py-2"><v-text-field v-model="temoin.prenom" :placeholder="`Prénom Témoin ${index + 1}`" variant="outlined" density="compact" hide-details bg-color="slate-50" rounded="lg"></v-text-field></td>
+                <td class="py-2"><v-text-field v-model="temoin.nom" :placeholder="`Nom Témoin ${index + 1}`" variant="outlined" density="compact" hide-details bg-color="slate-50" rounded="lg"></v-text-field></td>
+                <td class="py-2"><v-text-field v-model="temoin.cin" placeholder="CIN" variant="outlined" density="compact" hide-details bg-color="slate-50" rounded="lg"></v-text-field></td>
+                <td class="py-2"><v-text-field v-model="temoin.telephone" placeholder="Tél (ex: 77 000...)" variant="outlined" density="compact" hide-details bg-color="slate-50" rounded="lg"></v-text-field></td>
               </tr>
             </tbody>
           </v-table>
@@ -191,17 +208,18 @@
       <!-- Right Column -->
       <v-col cols="12" md="4">
         <!-- Détails financiers -->
-        <v-card elevation="0" border rounded="xl" class="pa-6 mb-6">
+        <v-card elevation="0" border rounded="xl" class="pa-6 mb-6 bg-white">
           <div class="d-flex align-center mb-6">
-            <v-icon color="primary" class="mr-3">mdi-credit-card-outline</v-icon>
-            <h2 class="text-subtitle-1 font-weight-bold" style="color: #1a3b5c;">Détails financiers</h2>
+            <v-avatar color="amber-lighten-5" size="36" class="mr-3">
+              <v-icon color="amber-darken-3" size="20">mdi-cash-multiple</v-icon>
+            </v-avatar>
+            <h2 class="text-subtitle-1 font-weight-bold" style="color: #0f2942;">Détails financiers</h2>
           </div>
           
-          <div class="text-caption font-weight-medium text-grey-darken-1 mb-1">Date de la transaction</div>
+          <div class="text-caption font-weight-bold text-grey-darken-1 mb-1">DATE DE LA TRANSACTION</div>
           <v-text-field
             v-model="acte.date_vente"
             type="date"
-            placeholder="mm/dd/yyyy"
             variant="outlined"
             density="comfortable"
             hide-details
@@ -209,83 +227,83 @@
             class="mb-4"
           ></v-text-field>
 
-          <div class="text-caption font-weight-medium text-grey-darken-1 mb-1">Montant FCFA</div>
+          <div class="text-caption font-weight-bold text-grey-darken-1 mb-1">MONTANT EN FCFA *</div>
           <v-text-field
-            v-model="acte.montant_cfa"
+            v-model.number="acte.montant_cfa"
             type="number"
-            placeholder="0"
+            placeholder="Ex: 5 000 000"
             variant="outlined"
             density="comfortable"
             hide-details
             rounded="lg"
-            bg-color="blue-lighten-5"
           >
             <template v-slot:append-inner>
-              <span class="text-primary font-weight-bold mt-1">FCFA</span>
+              <span class="text-caption font-weight-bold text-primary">FCFA</span>
             </template>
           </v-text-field>
-          <div class="text-caption text-grey mt-2 d-flex justify-space-between">
-            <span>Frais administratifs (2%)</span>
-            <span>Calcul automatique...</span>
-          </div>
         </v-card>
 
         <!-- Résumé du titre -->
-        <v-card elevation="0" rounded="xl" class="pa-6" color="#1a3b5c" theme="dark">
-          <h2 class="text-subtitle-1 font-weight-bold text-white mb-6" style="letter-spacing: 1px;">RÉSUMÉ DU TITRE</h2>
+        <v-card elevation="0" rounded="xl" class="pa-6" color="#0f2942" theme="dark">
+          <div class="d-flex align-center justify-space-between mb-4">
+            <h2 class="text-subtitle-2 font-weight-bold text-white" style="letter-spacing: 1px;">RÉSUMÉ DE L'ACTE</h2>
+            <v-icon color="blue-lighten-3" size="20">mdi-file-certificate</v-icon>
+          </div>
           
-          <div class="text-caption text-blue-lighten-2 font-weight-bold mb-1">PARCELLE</div>
-          <div class="text-h6 font-weight-bold text-white mb-4">{{ acte.parcelle_id || '- À renseigner -' }}</div>
+          <div class="text-caption text-blue-lighten-3 font-weight-bold mb-1">N° PARCELLE</div>
+          <div class="text-subtitle-1 font-weight-bold text-white mb-4">{{ resolvedParcelle ? resolvedParcelle.numero_parcelle : '- Non sélectionnée -' }}</div>
           
-          <v-row>
-            <v-col cols="6">
-              <div class="text-caption text-blue-lighten-2 font-weight-bold mb-1">VENDEUR</div>
-              <div class="text-body-1 text-white">{{ resolvedVendeur ? `${resolvedVendeur.prenom} ${resolvedVendeur.nom}` : '-' }}</div>
-            </v-col>
-            <v-col cols="6">
-              <div class="text-caption text-blue-lighten-2 font-weight-bold mb-1">ACHETEUR</div>
-              <div class="text-body-1 text-white">{{ resolvedAcheteur ? `${resolvedAcheteur.prenom} ${resolvedAcheteur.nom}` : '-' }}</div>
-            </v-col>
-          </v-row>
+          <div class="border-t border-blue-darken-3 pt-3 mt-2">
+            <div class="text-caption text-blue-lighten-3 font-weight-bold mb-1">VENDEUR</div>
+            <div class="text-body-2 text-white font-weight-bold mb-3">{{ resolvedVendeur ? `${resolvedVendeur.prenom} ${resolvedVendeur.nom}` : '-' }}</div>
+
+            <div class="text-caption text-blue-lighten-3 font-weight-bold mb-1">ACHETEUR</div>
+            <div class="text-body-2 text-white font-weight-bold mb-3">{{ resolvedAcheteur ? `${resolvedAcheteur.prenom} ${resolvedAcheteur.nom}` : '-' }}</div>
+
+            <div class="text-caption text-blue-lighten-3 font-weight-bold mb-1">MONTANT TRANSACTION</div>
+            <div class="text-h6 font-weight-black text-amber-accent-2">{{ formatMoney(acte.montant_cfa) }} FCFA</div>
+          </div>
         </v-card>
       </v-col>
     </v-row>
 
     <!-- Sticky Footer -->
-    <v-card elevation="4" class="position-fixed bottom-0 left-0 w-100 py-3 px-6 d-flex justify-space-between align-center" style="z-index: 100; border-top: 1px solid rgba(0,0,0,0.05);">
-      <div style="width: 260px;" class="hidden-sm-and-down"></div> <!-- Spacer for sidebar -->
+    <v-card elevation="4" class="position-fixed bottom-0 left-0 w-100 py-3 px-6 d-flex justify-space-between align-center bg-white" style="z-index: 100; border-top: 1px solid rgba(226, 232, 240, 0.8);">
+      <div style="width: 260px;" class="hidden-sm-and-down"></div>
       
       <div class="d-flex align-center text-caption text-grey-darken-1 w-100 max-w-md">
-        <v-icon size="small" class="mr-2">mdi-information-outline</v-icon>
-        Tous les champs sont requis pour la validation finale par le conservateur foncier.
+        <v-icon size="small" class="mr-2" color="info">mdi-information-outline</v-icon>
+        Tous les champs marqués d'un astérisque sont requis pour enregistrer l'acte.
       </div>
       
-      <div class="d-flex gap-4">
-        <v-btn variant="text" color="primary" class="text-none font-weight-bold" rounded="lg">Annuler</v-btn>
-        <v-btn variant="outlined" color="primary" class="text-none font-weight-bold bg-white" rounded="lg">Enregistrer en brouillon</v-btn>
-        <v-btn color="primary" elevation="0" class="text-none font-weight-bold" rounded="lg" @click="createActe()" :loading="loading">Enregistrer</v-btn>
+      <div class="d-flex gap-3">
+        <v-btn variant="text" color="grey-darken-1" class="text-none font-weight-bold" rounded="lg" to="/actes">Annuler</v-btn>
+        <v-btn color="primary" elevation="0" class="text-none font-weight-bold px-6" rounded="lg" @click="createActe()" :loading="loading">Enregistrer l'acte</v-btn>
       </div>
     </v-card>
+
     <!-- Dialog Nouveau Propriétaire -->
-    <v-dialog v-model="newProprietaireDialog" max-width="500">
-      <v-card rounded="xl">
-        <v-card-title class="text-subtitle-1 font-weight-bold pt-6 px-6">
-          Nouveau Propriétaire
+    <v-dialog v-model="newProprietaireDialog" max-width="500" persistent>
+      <v-card rounded="xl" class="pa-2">
+        <v-progress-linear v-if="savingProprietaire" indeterminate color="primary" height="4" class="rounded-top"></v-progress-linear>
+        <v-card-title class="text-subtitle-1 font-weight-bold pt-4 px-6" style="color: #0f2942;">
+          Créer un nouveau propriétaire
         </v-card-title>
-        <v-card-text class="px-6 pb-6">
-          <v-text-field v-model="newProprietaire.nom" label="Nom" variant="outlined" density="compact" class="mb-3"></v-text-field>
-          <v-text-field v-model="newProprietaire.prenom" label="Prénom" variant="outlined" density="compact" class="mb-3"></v-text-field>
-          <v-text-field v-model="newProprietaire.cin" label="N° CIN / Passeport" variant="outlined" density="compact" class="mb-3"></v-text-field>
-          <v-text-field v-model="newProprietaire.telephone" label="Téléphone" variant="outlined" density="compact" class="mb-3"></v-text-field>
-          <v-text-field v-model="newProprietaire.adresse" label="Adresse" variant="outlined" density="compact"></v-text-field>
+        <v-card-text class="px-6 pb-6 pt-2">
+          <v-text-field v-model="newProprietaire.prenom" label="Prénom *" variant="outlined" density="compact" class="mb-3" rounded="lg" :disabled="savingProprietaire"></v-text-field>
+          <v-text-field v-model="newProprietaire.nom" label="Nom *" variant="outlined" density="compact" class="mb-3" rounded="lg" :disabled="savingProprietaire"></v-text-field>
+          <v-text-field v-model="newProprietaire.cin" label="N° CIN / Passeport *" variant="outlined" density="compact" class="mb-3" rounded="lg" :disabled="savingProprietaire"></v-text-field>
+          <v-text-field v-model="newProprietaire.telephone" label="Téléphone" variant="outlined" density="compact" class="mb-3" rounded="lg" :disabled="savingProprietaire"></v-text-field>
+          <v-text-field v-model="newProprietaire.adresse" label="Adresse" variant="outlined" density="compact" rounded="lg" :disabled="savingProprietaire"></v-text-field>
         </v-card-text>
-        <v-card-actions class="px-6 pb-6 pt-0">
+        <v-card-actions class="px-6 pb-4 pt-0">
           <v-spacer></v-spacer>
-          <v-btn variant="text" color="grey-darken-1" class="text-none" @click="newProprietaireDialog = false">Annuler</v-btn>
-          <v-btn variant="flat" color="primary" class="text-none" @click="saveNewProprietaire" :loading="savingProprietaire">Créer & Sélectionner</v-btn>
+          <v-btn variant="text" color="grey-darken-1" class="text-none" :disabled="savingProprietaire" @click="newProprietaireDialog = false">Annuler</v-btn>
+          <v-btn variant="flat" color="primary" class="text-none font-weight-bold" rounded="lg" @click="saveNewProprietaire" :loading="savingProprietaire">Créer & Sélectionner</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
+
   </div>
 </template>
 
@@ -313,14 +331,13 @@ const acte = ref({
   parcelle_id: '',
   vendeur_id: '',
   acheteur_id: '',
-  montant_cfa: 0,
+  montant_cfa: null,
   date_vente: new Date().toISOString().substr(0, 10),
   temoins: [
-    { nom: '', prenom: '', cin: '' },
-    { nom: '', prenom: '', cin: '' },
-    { nom: '', prenom: '', cin: '' }
+    { nom: '', prenom: '', cin: '', telephone: '' },
+    { nom: '', prenom: '', cin: '', telephone: '' },
+    { nom: '', prenom: '', cin: '', telephone: '' }
   ],
-  // Visual fields only
   superficie: '',
   localisation: ''
 })
@@ -340,6 +357,11 @@ const newProprietaire = ref({
   adresse: ''
 })
 
+const formatMoney = (val) => {
+  if (!val) return '0'
+  return new Intl.NumberFormat('fr-FR').format(val)
+}
+
 const openNewProprietaireDialog = (target) => {
   proprietaireTarget.value = target
   newProprietaire.value = {
@@ -353,6 +375,10 @@ const openNewProprietaireDialog = (target) => {
 }
 
 const saveNewProprietaire = async () => {
+  if (!newProprietaire.value.nom || !newProprietaire.value.prenom || !newProprietaire.value.cin) {
+    notify.error("Veuillez remplir le prénom, nom et CIN du propriétaire")
+    return
+  }
   savingProprietaire.value = true
   try {
     const res = await api.proprietaires.create(newProprietaire.value)
@@ -363,23 +389,26 @@ const saveNewProprietaire = async () => {
       resolvedAcheteur.value = res
       acte.value.acheteur_id = res.id
       acheteurNotFound.value = false
+      acheteurCin.value = res.cin
     } else {
       resolvedVendeur.value = res
       acte.value.vendeur_id = res.id
       vendeurNotFound.value = false
+      vendeurCin.value = res.cin
     }
   } catch (e) {
-    notify.error("Erreur lors de la création du propriétaire")
+    notify.error("Erreur lors de la création du propriétaire: " + e.message)
   } finally {
     savingProprietaire.value = false
   }
 }
 
+
 const lookupParcelle = async () => {
   if (!parcelleSearch.value) return
   searchingParcelle.value = true
   try {
-    const data = await api.parcelles.getAll(0, 5, parcelleSearch.value)
+    const data = await api.parcelles.getAll(0, 1, parcelleSearch.value)
     if (data && data.length > 0) {
       const found = data[0]
       resolvedParcelle.value = found
@@ -448,9 +477,13 @@ const createActe = async () => {
     return
   }
 
+  if (!acte.value.montant_cfa || isNaN(parseFloat(acte.value.montant_cfa)) || parseFloat(acte.value.montant_cfa) <= 0) {
+    notify.error("Veuillez saisir le montant de la transaction (supérieur à 0 FCFA)")
+    return
+  }
+
   loading.value = true
   try {
-    // Prepare exact payload as requested
     const payload = {
       parcelle_id: acte.value.parcelle_id,
       vendeur_id: acte.value.vendeur_id,
@@ -462,23 +495,22 @@ const createActe = async () => {
     
     const response = await api.actes.create(payload)
     notify.success("Acte de vente créé avec succès")
-    setTimeout(() => {
-      if (response && response.id) {
-        router.push(`/actes/${response.id}`)
-      } else {
-        router.push('/actes')
-      }
-    }, 3000)
+    if (response && response.id) {
+      await router.push(`/actes/${response.id}`)
+    } else {
+      await router.push('/actes')
+    }
   } catch (error) {
     notify.error('Erreur: ' + (error.response?.data?.detail || error.message))
+  } finally {
     loading.value = false
   }
 }
 </script>
 
 <style scoped>
-.gap-4 {
-  gap: 16px;
+.gap-3 {
+  gap: 12px;
 }
 .bottom-0 {
   bottom: 0;

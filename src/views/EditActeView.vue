@@ -159,6 +159,7 @@
                 <th class="text-overline font-weight-bold text-grey-darken-1">PRÉNOM</th>
                 <th class="text-overline font-weight-bold text-grey-darken-1">NOM</th>
                 <th class="text-overline font-weight-bold text-grey-darken-1">CIN</th>
+                <th class="text-overline font-weight-bold text-grey-darken-1">N° TÉLÉPHONE</th>
               </tr>
             </thead>
             <tbody>
@@ -166,6 +167,7 @@
                 <td class="py-2"><v-text-field v-model="temoin.prenom" :placeholder="`Prénom ${index + 1}`" variant="outlined" density="compact" hide-details bg-color="grey-lighten-4" rounded="lg"></v-text-field></td>
                 <td class="py-2"><v-text-field v-model="temoin.nom" :placeholder="`Nom ${index + 1}`" variant="outlined" density="compact" hide-details bg-color="grey-lighten-4" rounded="lg"></v-text-field></td>
                 <td class="py-2"><v-text-field v-model="temoin.cin" placeholder="0000 0000 00000" variant="outlined" density="compact" hide-details bg-color="grey-lighten-4" rounded="lg"></v-text-field></td>
+                <td class="py-2"><v-text-field v-model="temoin.telephone" placeholder="Tél (ex: 77...)" variant="outlined" density="compact" hide-details bg-color="grey-lighten-4" rounded="lg"></v-text-field></td>
               </tr>
             </tbody>
           </v-table>

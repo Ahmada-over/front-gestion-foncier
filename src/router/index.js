@@ -88,6 +88,42 @@ const router = createRouter({
       name: 'patrimoine',
       component: () => import('../views/PatrimoineFamilialView.vue'),
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/decharges',
+      name: 'decharges',
+      component: () => import('../views/DechargesView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/decharges/nouvelle',
+      name: 'nouvelle-decharge',
+      component: () => import('../views/NouvelleDechargeView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/decharges/:id/editer',
+      name: 'edit-decharge',
+      component: () => import('../views/EditDechargeView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/decharges/:id',
+      name: 'decharge-detail',
+      component: () => import('../views/DechargeDetailView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/utilisateurs',
+      name: 'utilisateurs',
+      component: () => import('../views/UtilisateursView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/historique',
+      name: 'historique',
+      component: () => import('../views/HistoriqueView.vue'),
+      meta: { requiresAuth: true }
     }
   ]
 })

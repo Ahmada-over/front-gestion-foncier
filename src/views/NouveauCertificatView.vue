@@ -112,6 +112,35 @@
             </div>
           </v-expand-transition>
         </v-card>
+
+        <!-- Témoins -->
+        <v-card elevation="0" border rounded="xl" class="pa-6 mb-6">
+          <div class="d-flex align-center justify-space-between mb-4">
+            <div class="d-flex align-center">
+              <v-icon color="primary" class="mr-3">mdi-account-group-outline</v-icon>
+              <h2 class="text-subtitle-1 font-weight-bold" style="color: #0f2942;">Témoins (Optionnel)</h2>
+            </div>
+            <span class="text-caption text-grey-darken-1">Jusqu'à 3 témoins</span>
+          </div>
+
+          <div v-for="(t, index) in certificat.temoins" :key="index" class="mb-4 pa-4 rounded-xl border bg-grey-lighten-5">
+            <div class="font-weight-bold text-caption text-primary mb-2">TÉMOIN N° {{ index + 1 }}</div>
+            <v-row density="compact">
+              <v-col cols="12" sm="3">
+                <v-text-field v-model="t.prenom" label="Prénom" variant="outlined" density="compact" hide-details bg-color="white" rounded="lg"></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="3">
+                <v-text-field v-model="t.nom" label="Nom" variant="outlined" density="compact" hide-details bg-color="white" rounded="lg"></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="3">
+                <v-text-field v-model="t.cin" label="N° CIN" variant="outlined" density="compact" hide-details bg-color="white" rounded="lg"></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="3">
+                <v-text-field v-model="t.telephone" label="N° Téléphone" variant="outlined" density="compact" hide-details bg-color="white" rounded="lg" placeholder="Ex: 77 000 00 00"></v-text-field>
+              </v-col>
+            </v-row>
+          </div>
+        </v-card>
       </v-col>
 
       <!-- Right Column -->
@@ -193,6 +222,11 @@ const certificat = ref({
   parcelle_id: '',
   proprietaire_id: '',
   date_delivrance: new Date().toISOString().substr(0, 10),
+  temoins: [
+    { nom: '', prenom: '', cin: '', telephone: '' },
+    { nom: '', prenom: '', cin: '', telephone: '' },
+    { nom: '', prenom: '', cin: '', telephone: '' }
+  ],
   // Visual fields
   superficie: '',
   localisation: ''
@@ -217,7 +251,7 @@ const lookupParcelle = async () => {
   if (!parcelleSearch.value) return
   searchingParcelle.value = true
   try {
-    const data = await api.parcelles.getAll(0, 5, parcelleSearch.value)
+    const data = await api.parcelles.getAll(0, 5, parcelleSearch.value, true)
     if (data && data.length > 0) {
       const found = data[0]
       resolvedParcelle.value = found
@@ -225,14 +259,15 @@ const lookupParcelle = async () => {
       certificat.value.superficie = found.superficie_m2 + ' m²'
       certificat.value.localisation = found.localisation
     } else {
-      notify.error("Parcelle non trouvée")
+      notify.error("Cette parcelle possède déjà un certificat d'occupation ou n'existe pas.")
     }
   } catch (error) {
-    notify.error("Erreur lors de la recherche")
+    notify.error("Erreur lors de la recherche de la parcelle")
   } finally {
     searchingParcelle.value = false
   }
 }
+
 
 const lookupProprietaire = async () => {
   if (!proprietaireCin.value) return
@@ -263,10 +298,12 @@ const createCertificat = async () => {
 
   loading.value = true
   try {
+    const validTemoins = certificat.value.temoins.filter(t => t.nom || t.prenom || t.cin)
     const payload = {
       parcelle_id: certificat.value.parcelle_id,
       proprietaire_id: certificat.value.proprietaire_id,
-      date_delivrance: certificat.value.date_delivrance
+      date_delivrance: certificat.value.date_delivrance,
+      temoins: validTemoins
     }
     
     const response = await api.certificats.create(payload)
@@ -283,6 +320,7 @@ const createCertificat = async () => {
     loading.value = false
   }
 }
+
 </script>
 
 <style scoped>

@@ -29,15 +29,28 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/actes/:id/editer',
+      name: 'edit-acte',
+      component: () => import('../views/EditActeView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/actes/:id',
       name: 'acte-detail',
       component: () => import('../views/ActeDetailView.vue'),
       meta: { requiresAuth: true }
     },
+
     {
       path: '/certificats',
       name: 'certificats',
       component: () => import('../views/CertificatsView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/certificats/nouveau',
+      name: 'nouveau-certificat',
+      component: () => import('../views/NouveauCertificatView.vue'),
       meta: { requiresAuth: true }
     },
     {
@@ -50,6 +63,66 @@ const router = createRouter({
       path: '/parcelles',
       name: 'parcelles',
       component: () => import('../views/ParcellesView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/parcelles/:id',
+      name: 'parcelle-detail',
+      component: () => import('../views/ParcelleDetailView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/proprietaires',
+      name: 'proprietaires',
+      component: () => import('../views/ProprietairesView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/proprietaires/:id',
+      name: 'proprietaire-detail',
+      component: () => import('../views/ProprietaireDetailView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/patrimoine',
+      name: 'patrimoine',
+      component: () => import('../views/PatrimoineFamilialView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/decharges',
+      name: 'decharges',
+      component: () => import('../views/DechargesView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/decharges/nouvelle',
+      name: 'nouvelle-decharge',
+      component: () => import('../views/NouvelleDechargeView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/decharges/:id/editer',
+      name: 'edit-decharge',
+      component: () => import('../views/EditDechargeView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/decharges/:id',
+      name: 'decharge-detail',
+      component: () => import('../views/DechargeDetailView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/utilisateurs',
+      name: 'utilisateurs',
+      component: () => import('../views/UtilisateursView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/historique',
+      name: 'historique',
+      component: () => import('../views/HistoriqueView.vue'),
       meta: { requiresAuth: true }
     }
   ]

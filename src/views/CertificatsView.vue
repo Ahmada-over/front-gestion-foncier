@@ -11,7 +11,7 @@
         <h1 class="text-h5 font-weight-bold mb-1" style="color: #1a3b5c;">Certificats d'occupation</h1>
         <div class="text-subtitle-2 text-grey-darken-1">Gérez et suivez les titres d'occupation du village de Taofikh Bousso.</div>
       </div>
-      <v-btn color="#0a2540" prepend-icon="mdi-plus" rounded="lg" elevation="0" class="text-none font-weight-medium">
+      <v-btn color="#0a2540" prepend-icon="mdi-plus" rounded="lg" elevation="0" class="text-none font-weight-medium" to="/certificats/nouveau">
         Nouveau certificat
       </v-btn>
     </div>
@@ -28,7 +28,7 @@
             <v-chip color="success" size="small" variant="flat" class="font-weight-bold text-caption bg-green-lighten-5 text-green-darken-2">+16%</v-chip>
           </div>
           <div class="text-overline text-grey-darken-1 font-weight-medium mb-1" style="letter-spacing: 1px;">TOTAL ACTIFS</div>
-          <div class="text-h4 font-weight-black" style="color: #1a3b5c;">1,284</div>
+          <div class="text-h4 font-weight-black" style="color: #1a3b5c;">{{ stats.actifs }}</div>
         </v-card>
       </v-col>
 
@@ -42,7 +42,7 @@
             <v-chip color="error" size="small" variant="flat" class="font-weight-bold text-caption bg-red-lighten-5 text-red-darken-2">Action</v-chip>
           </div>
           <div class="text-overline text-grey-darken-1 font-weight-medium mb-1" style="letter-spacing: 1px;">EN EXPIRATION</div>
-          <div class="text-h4 font-weight-black" style="color: #e65100;">42</div>
+          <div class="text-h4 font-weight-black" style="color: #e65100;">{{ stats.expirations }}</div>
         </v-card>
       </v-col>
 
@@ -56,7 +56,7 @@
             <v-chip color="grey" size="small" variant="flat" class="font-weight-bold text-caption bg-grey-lighten-4 text-grey-darken-2">Stable</v-chip>
           </div>
           <div class="text-overline text-grey-darken-1 font-weight-medium mb-1" style="letter-spacing: 1px;">BROUILLONS</div>
-          <div class="text-h4 font-weight-black" style="color: #424242;">15</div>
+          <div class="text-h4 font-weight-black" style="color: #424242;">{{ stats.brouillons }}</div>
         </v-card>
       </v-col>
 
@@ -70,7 +70,7 @@
             <v-chip color="error" size="small" variant="flat" class="font-weight-bold text-caption bg-red-lighten-5 text-red-darken-2">-3%</v-chip>
           </div>
           <div class="text-overline text-grey-darken-1 font-weight-medium mb-1" style="letter-spacing: 1px;">RÉVOCATIONS</div>
-          <div class="text-h4 font-weight-black" style="color: #c62828;">08</div>
+          <div class="text-h4 font-weight-black" style="color: #c62828;">{{ stats.revocations }}</div>
         </v-card>
       </v-col>
     </v-row>
@@ -142,7 +142,7 @@
       <!-- Pagination -->
       <div class="d-flex justify-space-between align-center px-6 py-4 border-t">
         <div class="text-caption text-grey-darken-1">
-          Affichage de <span class="font-weight-bold">1</span> à <span class="font-weight-bold">4</span> sur <span class="font-weight-bold">1,284</span> certificats
+          Affichage de <span class="font-weight-bold">1</span> à <span class="font-weight-bold">{{ certificats.length }}</span> sur <span class="font-weight-bold">{{ certificats.length }}</span> certificats
         </div>
         <div class="d-flex align-center gap-1">
           <v-btn variant="text" size="small" color="grey-darken-1" class="text-none text-caption" disabled>Précédent</v-btn>
@@ -169,16 +169,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { api } from '../services/api'
 
-const certificats = ref([
-  { id: 1, numero: 'CO-2024-0012', proprietaire: 'Ousmane Kane', parcelle: 'P-98', dateDelivrance: '01/01/2024', dateExpiration: '01/01/2029', statut: 'Actif' },
-  { id: 2, numero: 'CO-2024-0013', proprietaire: 'Mariam Diop', parcelle: 'P-194', dateDelivrance: '12/02/2024', dateExpiration: '02/02/2025', statut: 'Actif' },
-  { id: 3, numero: 'CO-2023-0902', proprietaire: 'Babacar Sall', parcelle: 'P-43', dateDelivrance: '15/11/2023', dateExpiration: '15/11/2028', statut: 'Expiré' },
-  { id: 4, numero: 'CO-2024-0005', proprietaire: 'Aminata Seck', parcelle: 'P-17', dateDelivrance: '05/01/2024', dateExpiration: '05/01/2029', statut: 'Brouillon' },
-])
+const certificats = ref([])
 const loading = ref(false)
+
+const stats = computed(() => {
+  const actifs = certificats.value.filter(c => c.statut.toLowerCase() === 'actif' || c.statut.toLowerCase() === 'valide').length
+  const brouillons = certificats.value.filter(c => c.statut.toLowerCase() === 'brouillon').length
+  const expirations = certificats.value.filter(c => c.statut.toLowerCase() === 'expire' || c.statut.toLowerCase() === 'expiré').length
+  const revocations = certificats.value.filter(c => c.statut.toLowerCase() === 'revoque' || c.statut.toLowerCase() === 'révoqué').length
+  return { actifs, brouillons, expirations, revocations }
+})
 
 const fetchCertificats = async () => {
   loading.value = true

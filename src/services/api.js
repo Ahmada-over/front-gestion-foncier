@@ -1,4 +1,6 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8005/api/v1'
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD 
+  ? 'https://gestion-foncier-346078879462.europe-west1.run.app/api/v1' 
+  : 'http://localhost:8005/api/v1')
 
 const getToken = () => localStorage.getItem('access_token')
 const setToken = (token) => localStorage.setItem('access_token', token)

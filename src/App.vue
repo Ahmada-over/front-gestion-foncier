@@ -4,11 +4,10 @@
     <v-navigation-drawer
       v-if="!isLogin"
       v-model="drawer"
-      :temporary="mobile"
       app
       elevation="0"
       width="280"
-      style="border-right: 1px solid #f1f5f9; background: #ffffff; z-index: 1005;"
+      style="border-right: 1px solid #f1f5f9; background: #ffffff;"
     >
       <!-- Drawer Header -->
       <div class="px-5 py-4 d-flex align-center justify-space-between">
@@ -27,15 +26,15 @@
       <v-divider class="mb-3" style="border-color: #f1f5f9;"></v-divider>
 
       <v-list density="comfortable" nav class="px-3">
-        <v-list-item @click="mobile && (drawer = false)" prepend-icon="mdi-view-dashboard-outline" title="Tableau de bord" value="home" to="/" rounded="xl" class="mb-1"></v-list-item>
-        <v-list-item @click="mobile && (drawer = false)" prepend-icon="mdi-file-document-outline" title="Actes de vente" value="actes" to="/actes" rounded="xl" class="mb-1"></v-list-item>
-        <v-list-item @click="mobile && (drawer = false)" prepend-icon="mdi-certificate-outline" title="Certificats d'occupation" value="certificats" to="/certificats" rounded="xl" class="mb-1"></v-list-item>
-        <v-list-item @click="mobile && (drawer = false)" prepend-icon="mdi-file-undo-outline" title="Décharges" value="decharges" to="/decharges" rounded="xl" class="mb-1"></v-list-item>
-        <v-list-item @click="mobile && (drawer = false)" prepend-icon="mdi-map-marker-outline" title="Parcelles" value="parcelles" to="/parcelles" rounded="xl" class="mb-1"></v-list-item>
-        <v-list-item @click="mobile && (drawer = false)" prepend-icon="mdi-home-group" title="Patrimoine Familial" value="patrimoine" to="/patrimoine" rounded="xl" class="mb-1"></v-list-item>
-        <v-list-item @click="mobile && (drawer = false)" prepend-icon="mdi-account-group-outline" title="Propriétaires" value="proprietaires" to="/proprietaires" rounded="xl" class="mb-1"></v-list-item>
-        <v-list-item @click="mobile && (drawer = false)" prepend-icon="mdi-account-outline" title="Utilisateurs" value="utilisateurs" to="/utilisateurs" rounded="xl" class="mb-1"></v-list-item>
-        <v-list-item @click="mobile && (drawer = false)" prepend-icon="mdi-history" title="Historique" value="historique" to="/historique" rounded="xl"></v-list-item>
+        <v-list-item prepend-icon="mdi-view-dashboard-outline" title="Tableau de bord" value="home" to="/" rounded="xl" class="mb-1"></v-list-item>
+        <v-list-item prepend-icon="mdi-file-document-outline" title="Actes de vente" value="actes" to="/actes" rounded="xl" class="mb-1"></v-list-item>
+        <v-list-item prepend-icon="mdi-certificate-outline" title="Certificats d'occupation" value="certificats" to="/certificats" rounded="xl" class="mb-1"></v-list-item>
+        <v-list-item prepend-icon="mdi-file-undo-outline" title="Décharges" value="decharges" to="/decharges" rounded="xl" class="mb-1"></v-list-item>
+        <v-list-item prepend-icon="mdi-map-marker-outline" title="Parcelles" value="parcelles" to="/parcelles" rounded="xl" class="mb-1"></v-list-item>
+        <v-list-item prepend-icon="mdi-home-group" title="Patrimoine Familial" value="patrimoine" to="/patrimoine" rounded="xl" class="mb-1"></v-list-item>
+        <v-list-item prepend-icon="mdi-account-group-outline" title="Propriétaires" value="proprietaires" to="/proprietaires" rounded="xl" class="mb-1"></v-list-item>
+        <v-list-item prepend-icon="mdi-account-outline" title="Utilisateurs" value="utilisateurs" to="/utilisateurs" rounded="xl" class="mb-1"></v-list-item>
+        <v-list-item prepend-icon="mdi-history" title="Historique" value="historique" to="/historique" rounded="xl"></v-list-item>
       </v-list>
 
       <template v-slot:append>

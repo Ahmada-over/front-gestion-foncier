@@ -1,8 +1,15 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 
+const isTauri = typeof window !== 'undefined' && (
+  window.__TAURI_INTERNALS__ !== undefined || 
+  window.__TAURI__ !== undefined || 
+  window.location.protocol === 'tauri:' || 
+  window.location.protocol === 'file:'
+)
+
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: isTauri ? createWebHashHistory() : createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/login',

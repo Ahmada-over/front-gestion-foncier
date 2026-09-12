@@ -1,12 +1,20 @@
 <template>
   <div>
     <!-- Header: Title and Button -->
-    <div class="d-flex justify-space-between align-center mb-6">
+    <div class="d-flex flex-wrap justify-space-between align-center mb-6 ga-4">
       <div>
-        <h1 class="text-h5 font-weight-bold mb-1" style="color: #1a3b5c;">Gestion des parcelles</h1>
+        <h1 class="text-h5 font-weight-bold mb-1" style="color: #0f2942;">Gestion des parcelles</h1>
         <div class="text-subtitle-2 text-grey-darken-1">Consultez et gérez l'ensemble des parcelles du village.</div>
       </div>
-      <v-btn color="#0a2540" prepend-icon="mdi-plus" rounded="lg" elevation="0" class="text-none font-weight-medium" @click="openAddDialog">
+      <v-btn
+        color="primary"
+        prepend-icon="mdi-plus"
+        rounded="lg"
+        elevation="2"
+        class="text-none font-weight-bold"
+        style="background: linear-gradient(135deg, #0f2942 0%, #1e40af 100%) !important; box-shadow: 0 4px 12px rgba(15, 41, 66, 0.25) !important;"
+        @click="openAddDialog"
+      >
         Ajouter une parcelle
       </v-btn>
     </div>
@@ -17,23 +25,25 @@
       <v-col cols="12" sm="6" md="3">
         <v-card elevation="0" border rounded="xl" class="pa-5 h-100 stat-card">
           <div class="d-flex justify-space-between align-start mb-4">
-            <v-avatar color="indigo-lighten-5" size="48" rounded="lg">
-              <v-icon color="indigo-darken-2">mdi-map-marker-multiple-outline</v-icon>
+            <v-avatar color="indigo-lighten-5" size="48" rounded="lg" class="icon-avatar">
+              <v-icon color="indigo-darken-2" size="24">mdi-map-marker-multiple-outline</v-icon>
             </v-avatar>
+            <v-chip color="indigo" size="small" variant="tonal" class="font-weight-bold text-caption">Total</v-chip>
           </div>
-          <div class="text-overline text-grey-darken-1 font-weight-medium mb-1" style="letter-spacing: 1px;">TOTAL PARCELLES</div>
-          <div class="text-h4 font-weight-black" style="color: #1a3b5c;">{{ totalParcelles }}</div>
+          <div class="text-overline text-grey-darken-1 font-weight-bold mb-1" style="letter-spacing: 0.8px;">TOTAL PARCELLES</div>
+          <div class="text-h4 font-weight-black" style="color: #0f2942;">{{ totalParcelles }}</div>
         </v-card>
       </v-col>
       <!-- Total occupés -->
       <v-col cols="12" sm="6" md="3">
         <v-card elevation="0" border rounded="xl" class="pa-5 h-100 stat-card">
           <div class="d-flex justify-space-between align-start mb-4">
-            <v-avatar color="blue-lighten-5" size="48" rounded="lg">
-              <v-icon color="blue-darken-2">mdi-home-city-outline</v-icon>
+            <v-avatar color="blue-lighten-5" size="48" rounded="lg" class="icon-avatar">
+              <v-icon color="blue-darken-2" size="24">mdi-home-city-outline</v-icon>
             </v-avatar>
+            <v-chip color="info" size="small" variant="tonal" class="font-weight-bold text-caption">Attribuées</v-chip>
           </div>
-          <div class="text-overline text-grey-darken-1 font-weight-medium mb-1" style="letter-spacing: 1px;">TOTAL OCCUPÉES</div>
+          <div class="text-overline text-grey-darken-1 font-weight-bold mb-1" style="letter-spacing: 0.8px;">TOTAL OCCUPÉES</div>
           <div class="text-h4 font-weight-black" style="color: #0288d1;">{{ totalOccupees }}</div>
         </v-card>
       </v-col>
@@ -41,11 +51,12 @@
       <v-col cols="12" sm="6" md="3">
         <v-card elevation="0" border rounded="xl" class="pa-5 h-100 stat-card">
           <div class="d-flex justify-space-between align-start mb-4">
-            <v-avatar color="green-lighten-5" size="48" rounded="lg">
-              <v-icon color="green-darken-2">mdi-map-marker-check-outline</v-icon>
+            <v-avatar color="green-lighten-5" size="48" rounded="lg" class="icon-avatar">
+              <v-icon color="green-darken-2" size="24">mdi-map-marker-check-outline</v-icon>
             </v-avatar>
+            <v-chip color="success" size="small" variant="tonal" class="font-weight-bold text-caption">Disponibles</v-chip>
           </div>
-          <div class="text-overline text-grey-darken-1 font-weight-medium mb-1" style="letter-spacing: 1px;">TOTAL DISPONIBLES</div>
+          <div class="text-overline text-grey-darken-1 font-weight-bold mb-1" style="letter-spacing: 0.8px;">TOTAL DISPONIBLES</div>
           <div class="text-h4 font-weight-black" style="color: #2e7d32;">{{ totalDisponibles }}</div>
         </v-card>
       </v-col>
@@ -53,31 +64,32 @@
       <v-col cols="12" sm="6" md="3">
         <v-card elevation="0" border rounded="xl" class="pa-5 h-100 stat-card">
           <div class="d-flex justify-space-between align-start mb-4">
-            <v-avatar color="red-lighten-5" size="48" rounded="lg">
-              <v-icon color="red-darken-2">mdi-alert-octagon-outline</v-icon>
+            <v-avatar color="red-lighten-5" size="48" rounded="lg" class="icon-avatar">
+              <v-icon color="red-darken-2" size="24">mdi-alert-octagon-outline</v-icon>
             </v-avatar>
+            <v-chip color="error" size="small" variant="tonal" class="font-weight-bold text-caption">Litiges</v-chip>
           </div>
-          <div class="text-overline text-grey-darken-1 font-weight-medium mb-1" style="letter-spacing: 1px;">TOTAL EN LITIGES</div>
+          <div class="text-overline text-grey-darken-1 font-weight-bold mb-1" style="letter-spacing: 0.8px;">TOTAL EN LITIGES</div>
           <div class="text-h4 font-weight-black" style="color: #c62828;">{{ totalLitiges }}</div>
         </v-card>
       </v-col>
     </v-row>
 
     <!-- Main Content Container -->
-    <v-card elevation="0" border rounded="xl" class="pa-0 mt-6 bg-white">
+    <v-card elevation="0" border rounded="xl" class="pa-0 mt-6 bg-white overflow-hidden">
       
       <!-- Filters Row -->
-      <div class="d-flex justify-space-between align-center px-6 py-4 border-b bg-white" style="border-top-left-radius: 24px; border-top-right-radius: 24px;">
-        <div class="d-flex gap-4 align-center">
+      <div class="d-flex flex-wrap justify-space-between align-center px-6 py-4 border-b bg-white ga-3">
+        <div class="d-flex flex-wrap gap-4 align-center ga-3">
           <v-text-field
             v-model="search"
-            placeholder="Rechercher par numéro..."
+            placeholder="Rechercher par numéro ou lieu..."
             variant="outlined"
             density="compact"
             hide-details
             rounded="lg"
             prepend-inner-icon="mdi-magnify"
-            style="width: 300px;"
+            style="width: 280px;"
             @keyup.enter="fetchParcelles"
             @click:clear="fetchParcelles"
             clearable
@@ -96,40 +108,82 @@
             ></v-select>
           </div>
         </div>
+
+        <v-tooltip text="Actualiser" location="bottom">
+          <template v-slot:activator="{ props }">
+            <v-btn
+              v-bind="props"
+              icon="mdi-refresh"
+              variant="outlined"
+              color="grey-darken-1"
+              size="small"
+              rounded="lg"
+              @click="fetchParcelles"
+            ></v-btn>
+          </template>
+        </v-tooltip>
       </div>
 
       <!-- Table -->
-      <v-table>
+      <v-table hover class="w-100">
         <thead>
           <tr>
-            <th class="text-overline text-grey-darken-1 font-weight-bold py-4">N° PARCELLE</th>
-            <th class="text-overline text-grey-darken-1 font-weight-bold py-4">SUPERFICIE</th>
-            <th class="text-overline text-grey-darken-1 font-weight-bold py-4">LOCALISATION</th>
-            <th class="text-overline text-grey-darken-1 font-weight-bold py-4 text-center">STATUT</th>
-            <th class="text-overline text-grey-darken-1 font-weight-bold py-4 text-right">DATE CRÉATION</th>
-            <th class="text-overline text-grey-darken-1 font-weight-bold py-4 text-center">ACTIONS</th>
+            <th class="text-overline font-weight-bold py-4">N° PARCELLE</th>
+            <th class="text-overline font-weight-bold py-4">SUPERFICIE</th>
+            <th class="text-overline font-weight-bold py-4">LOCALISATION</th>
+            <th class="text-overline font-weight-bold py-4 text-center">STATUT</th>
+            <th class="text-overline font-weight-bold py-4 text-right">DATE CRÉATION</th>
+            <th class="text-overline font-weight-bold py-4 text-center">ACTIONS</th>
           </tr>
         </thead>
         <tbody>
-          <v-progress-linear v-if="loading" indeterminate color="primary"></v-progress-linear>
-          <tr v-for="item in parcelles" :key="item.id" class="border-b-thin align-middle parcelle-row" @click="goToDetail(item.id)">
-            <td class="font-weight-bold text-primary py-4">{{ item.numero_parcelle }}</td>
+          <v-progress-linear v-if="loading" indeterminate color="primary" height="3"></v-progress-linear>
+          <tr v-for="item in parcelles" :key="item.id" class="hover-row align-middle parcelle-row" @click="goToDetail(item.id)">
+            <td class="font-weight-bold text-primary py-4">
+              <span class="d-inline-flex align-center ga-1">
+                <v-icon size="16" color="primary">mdi-map-marker-outline</v-icon>
+                {{ item.numero_parcelle }}
+              </span>
+            </td>
             <td class="text-grey-darken-3 font-weight-medium py-4">{{ item.superficie_m2 }} m²</td>
             <td class="text-grey-darken-1 py-4">{{ item.localisation || 'Non spécifiée' }}</td>
             <td class="text-center py-4">
-              <v-chip v-bind="getStatusProps(item.statut)" size="small" class="font-weight-bold px-4 text-caption" style="text-transform: uppercase;">
+              <v-chip v-bind="getStatusProps(item.statut)" size="small" class="font-weight-bold px-3">
                 {{ item.statut }}
               </v-chip>
             </td>
-            <td class="text-right text-grey-darken-1 py-4 text-body-2">{{ formatDate(item.created_at) }}</td>
+            <td class="text-right text-grey-darken-1 py-4 text-body-2 font-weight-medium">{{ formatDate(item.created_at) }}</td>
             <td class="text-center py-4 text-grey-darken-1">
-              <v-btn size="x-small" variant="text" icon="mdi-eye-outline" class="mx-1" color="primary" @click.stop="goToDetail(item.id)"></v-btn>
-              <v-btn size="x-small" variant="text" icon="mdi-pencil-outline" class="mx-1" color="grey-darken-1" @click.stop="openEditDialog(item)"></v-btn>
-              <v-btn size="x-small" variant="text" icon="mdi-delete-outline" class="mx-1" color="error" @click.stop="confirmDelete(item)"></v-btn>
+              <v-tooltip text="Consulter les détails" location="top">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" size="x-small" variant="text" icon="mdi-eye-outline" class="mx-1" color="primary" @click.stop="goToDetail(item.id)"></v-btn>
+                </template>
+              </v-tooltip>
+              <v-tooltip text="Modifier" location="top">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" size="x-small" variant="text" icon="mdi-pencil-outline" class="mx-1" color="grey-darken-2" @click.stop="openEditDialog(item)"></v-btn>
+                </template>
+              </v-tooltip>
+              <v-tooltip text="Supprimer" location="top">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" size="x-small" variant="text" icon="mdi-delete-outline" class="mx-1" color="error" @click.stop="confirmDelete(item)"></v-btn>
+                </template>
+              </v-tooltip>
             </td>
           </tr>
           <tr v-if="!loading && parcelles.length === 0">
-            <td colspan="6" class="text-center py-8 text-grey">Aucune parcelle trouvée</td>
+            <td colspan="6" class="text-center pa-10">
+              <div class="d-flex flex-column align-center justify-center">
+                <v-avatar color="grey-lighten-4" size="64" class="mb-3">
+                  <v-icon size="32" color="grey-darken-1">mdi-map-marker-outline</v-icon>
+                </v-avatar>
+                <div class="text-subtitle-1 font-weight-bold text-grey-darken-3 mb-1">Aucune parcelle trouvée</div>
+                <div class="text-caption text-grey-darken-1 mb-4">Aucune parcelle ne correspond à vos critères de recherche.</div>
+                <v-btn color="primary" size="small" prepend-icon="mdi-plus" rounded="lg" @click="openAddDialog">
+                  Ajouter une parcelle
+                </v-btn>
+              </div>
+            </td>
           </tr>
         </tbody>
       </v-table>

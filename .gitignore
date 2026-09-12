@@ -25,3 +25,6 @@ dist-ssr
 
 # Tauri target
 src-tauri/target/
+
+AGENTS.md
+SKILL.md

@@ -1,9 +1,9 @@
 <template>
   <v-app style="background-color: #f8fafc;">
     <!-- Navigation Drawer -->
-    <v-navigation-drawer v-if="!isLogin" v-model="drawer" app elevation="0" width="270" style="border-right: 1px solid #f1f5f9; background: #ffffff;">
+    <v-navigation-drawer v-if="!isLogin" v-model="drawer" app elevation="0" width="280" style="border-right: 1px solid #f1f5f9; background: #ffffff;">
       <div class="px-5 py-5 d-flex align-center">
-        <v-avatar color="primary" size="40" class="mr-3 shadow-sm" style="background: linear-gradient(135deg, #0f2942 0%, #1e40af 100%) !important;">
+        <v-avatar color="primary" size="42" class="mr-3" style="background: linear-gradient(135deg, #0f2942 0%, #1e40af 100%) !important; box-shadow: 0 4px 10px rgba(15, 41, 66, 0.2);">
           <v-icon color="white" size="22">mdi-office-building-marker</v-icon>
         </v-avatar>
         <div>
@@ -27,12 +27,12 @@
       </v-list>
 
       <template v-slot:append>
-        <div class="pa-4 m-3 rounded-xl bg-slate-50 border border-slate-200">
+        <div class="pa-4 m-3 rounded-xl border border-slate-200" style="background: #f8fafc;">
           <div class="d-flex align-center">
             <v-avatar size="38" color="blue-lighten-4" class="mr-3">
               <span class="text-caption font-weight-bold text-blue-darken-3">TB</span>
             </v-avatar>
-            <div class="overflow-hidden">
+            <div class="overflow-hidden flex-grow-1">
               <div class="text-subtitle-2 font-weight-bold text-truncate" style="color: #0f2942; line-height: 1.2;">{{ userName }}</div>
               <div class="text-caption text-grey-darken-1 text-truncate">{{ userRole }}</div>
             </div>
@@ -42,7 +42,7 @@
     </v-navigation-drawer>
 
     <!-- App Bar -->
-    <v-app-bar v-if="!isLogin" app color="white" elevation="0" height="70" style="border-bottom: 1px solid #f1f5f9;">
+    <v-app-bar v-if="!isLogin" app color="white" elevation="0" height="70" class="modern-app-bar">
       <v-app-bar-nav-icon @click="drawer = !drawer" class="hidden-md-and-up"></v-app-bar-nav-icon>
 
       <div class="px-4 w-100" style="max-width: 520px;">
@@ -57,13 +57,13 @@
               v-bind="props"
               v-model="globalSearch"
               prepend-inner-icon="mdi-magnify"
-              placeholder="Rechercher une parcelle, acte, décharge, CIN..."
-              variant="solo"
-              density="comfortable"
+              placeholder="Rechercher parcelle, acte, décharge, CIN..."
+              variant="outlined"
+              density="compact"
               hide-details
-              flat
-              bg-color="grey-lighten-4"
-              rounded="xl"
+              rounded="lg"
+              bg-color="white"
+              style="border-color: #e2e8f0;"
               @input="onGlobalSearch"
               @keydown.escape="showSearchResults = false"
               @keydown.enter="goToFirstResult"
@@ -194,14 +194,28 @@
 
       <v-spacer></v-spacer>
 
-      <div class="d-flex align-center pr-4">
-        <v-btn icon variant="text" color="grey-darken-1" size="small" class="mr-1">
-          <v-badge color="error" dot>
-            <v-icon>mdi-bell-outline</v-icon>
-          </v-badge>
-        </v-btn>
-        <v-btn icon="mdi-cog-outline" variant="text" color="grey-darken-1" size="small" class="mr-1"></v-btn>
-        <v-btn icon="mdi-logout" variant="text" color="grey-darken-1" size="small" @click="handleLogout"></v-btn>
+      <div class="d-flex align-center pr-4 ga-1">
+        <v-tooltip text="Notifications" location="bottom">
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props" icon variant="text" color="grey-darken-1" size="small">
+              <v-badge color="error" dot>
+                <v-icon>mdi-bell-outline</v-icon>
+              </v-badge>
+            </v-btn>
+          </template>
+        </v-tooltip>
+
+        <v-tooltip text="Paramètres" location="bottom">
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props" icon="mdi-cog-outline" variant="text" color="grey-darken-1" size="small"></v-btn>
+          </template>
+        </v-tooltip>
+
+        <v-tooltip text="Se déconnecter" location="bottom">
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props" icon="mdi-logout" variant="text" color="grey-darken-1" size="small" @click="handleLogout"></v-btn>
+          </template>
+        </v-tooltip>
       </div>
     </v-app-bar>
 
@@ -219,15 +233,19 @@
     <!-- Speed Dial Quick Creation FAB -->
     <v-menu v-if="!isLogin" location="top left">
       <template v-slot:activator="{ props }">
-        <v-btn
-          v-bind="props"
-          icon="mdi-plus"
-          color="primary"
-          size="large"
-          elevation="4"
-          class="position-fixed"
-          style="bottom: 30px; right: 30px; z-index: 99; background: linear-gradient(135deg, #0f2942 0%, #1e40af 100%) !important;"
-        ></v-btn>
+        <v-tooltip text="Création rapide" location="left">
+          <template v-slot:activator="{ props: tooltipProps }">
+            <v-btn
+              v-bind="{ ...props, ...tooltipProps }"
+              icon="mdi-plus"
+              color="primary"
+              size="large"
+              elevation="4"
+              class="position-fixed"
+              style="bottom: 30px; right: 30px; z-index: 99; background: linear-gradient(135deg, #0f2942 0%, #1e40af 100%) !important; box-shadow: 0 10px 25px -5px rgba(15, 41, 66, 0.4) !important;"
+            ></v-btn>
+          </template>
+        </v-tooltip>
       </template>
       <v-list rounded="xl" elevation="6" class="pa-2 mb-2">
         <v-list-item prepend-icon="mdi-file-document-plus-outline" title="Nouvel acte de vente" to="/actes/nouveau" rounded="lg"></v-list-item>

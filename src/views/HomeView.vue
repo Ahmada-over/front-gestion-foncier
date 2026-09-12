@@ -1,29 +1,59 @@
 <template>
   <div>
-    <!-- Header: Title and Button -->
-    <div class="d-flex justify-space-between align-center mb-6">
+    <!-- Header: Title and Buttons -->
+    <div class="d-flex flex-wrap justify-space-between align-center mb-6 ga-4">
       <div>
-        <h1 class="text-h5 font-weight-bold mb-1" style="color: #1a3b5c;">Tableau de bord</h1>
+        <div class="d-flex align-center ga-2 mb-1">
+          <h1 class="text-h5 font-weight-bold" style="color: #0f2942;">Tableau de bord</h1>
+          <v-chip size="x-small" color="success" variant="tonal" class="font-weight-bold px-2">
+            <v-icon start size="12" icon="mdi-circle-medium"></v-icon>
+            Actif
+          </v-chip>
+        </div>
         <div class="text-subtitle-2 text-grey-darken-1">Aperçu général de l'activité foncière à Taofikh Bousso.</div>
       </div>
-      <v-btn color="#0a2540" prepend-icon="mdi-plus" rounded="lg" elevation="0" class="text-none font-weight-medium" to="/actes/nouveau">
-        Nouvel Acte de Vente
-      </v-btn>
+      <div class="d-flex align-center ga-2">
+        <v-tooltip text="Rafraîchir les données" location="bottom">
+          <template v-slot:activator="{ props }">
+            <v-btn
+              v-bind="props"
+              icon="mdi-refresh"
+              variant="outlined"
+              color="grey-darken-2"
+              size="small"
+              rounded="lg"
+              :loading="loading || loadingActivities"
+              @click="refreshAll"
+            ></v-btn>
+          </template>
+        </v-tooltip>
+        <v-btn
+          color="primary"
+          prepend-icon="mdi-plus"
+          rounded="lg"
+          elevation="2"
+          class="text-none font-weight-bold"
+          style="background: linear-gradient(135deg, #0f2942 0%, #1e40af 100%) !important; box-shadow: 0 4px 12px rgba(15, 41, 66, 0.25) !important;"
+          to="/actes/nouveau"
+        >
+          Nouvel Acte de Vente
+        </v-btn>
+      </div>
     </div>
 
     <!-- Cards Row -->
     <v-row>
       <!-- Card 1: TOTAL ACTES DE VENTE -->
       <v-col cols="12" sm="6" md="3">
-        <v-card elevation="0" border rounded="xl" class="pa-5 h-100 stat-card transition-swing">
+        <v-card elevation="0" border rounded="xl" class="pa-5 h-100 stat-card" to="/actes">
           <div class="d-flex justify-space-between align-start mb-4">
             <v-avatar color="blue-lighten-5" size="48" rounded="lg" class="icon-avatar">
-              <v-icon color="blue-darken-2">mdi-file-document-outline</v-icon>
+              <v-icon color="primary" size="24">mdi-file-document-outline</v-icon>
             </v-avatar>
-            <v-chip color="success" size="small" variant="flat" class="font-weight-bold text-caption bg-green-lighten-5 text-green-darken-2">+4%</v-chip>
+            <v-chip color="primary" size="small" variant="tonal" class="font-weight-bold text-caption">Actes</v-chip>
           </div>
-          <div class="text-overline text-grey-darken-1 font-weight-medium mb-1" style="letter-spacing: 1px;">TOTAL ACTES DE VENTE</div>
-          <div class="text-h4 font-weight-black stat-number" style="color: #1a3b5c;">
+          <div class="text-overline text-grey-darken-1 font-weight-bold mb-1" style="letter-spacing: 0.8px;">TOTAL ACTES DE VENTE</div>
+          <div class="text-h4 font-weight-black" style="color: #0f2942;">
             <v-skeleton-loader v-if="loading" type="text" width="80"></v-skeleton-loader>
             <span v-else>{{ formatNumber(stats.totalActes) }}</span>
           </div>
@@ -32,16 +62,16 @@
 
       <!-- Card 2: ACTES EN ATTENTE -->
       <v-col cols="12" sm="6" md="3">
-        <v-card elevation="0" border rounded="xl" class="pa-5 h-100 stat-card transition-swing">
+        <v-card elevation="0" border rounded="xl" class="pa-5 h-100 stat-card" to="/actes">
           <div class="d-flex justify-space-between align-start mb-4">
-            <v-avatar color="orange-lighten-5" size="48" rounded="lg" class="icon-avatar">
-              <v-icon color="orange-darken-2">mdi-file-clock-outline</v-icon>
+            <v-avatar color="amber-lighten-5" size="48" rounded="lg" class="icon-avatar">
+              <v-icon color="warning" size="24">mdi-clock-alert-outline</v-icon>
             </v-avatar>
-            <v-chip v-if="stats.actesEnAttente > 0" color="error" size="small" variant="flat" class="font-weight-bold text-caption bg-red-lighten-5 text-red-darken-2">Attention</v-chip>
-            <v-chip v-else color="success" size="small" variant="flat" class="font-weight-bold text-caption bg-green-lighten-5 text-green-darken-2">OK</v-chip>
+            <v-chip v-if="stats.actesEnAttente > 0" color="warning" size="small" variant="tonal" class="font-weight-bold text-caption">À traiter</v-chip>
+            <v-chip v-else color="success" size="small" variant="tonal" class="font-weight-bold text-caption">À jour</v-chip>
           </div>
-          <div class="text-overline text-grey-darken-1 font-weight-medium mb-1" style="letter-spacing: 1px;">ACTES EN ATTENTE</div>
-          <div class="text-h4 font-weight-black stat-number" style="color: #e65100;">
+          <div class="text-overline text-grey-darken-1 font-weight-bold mb-1" style="letter-spacing: 0.8px;">ACTES EN ATTENTE</div>
+          <div class="text-h4 font-weight-black" style="color: #d97706;">
             <v-skeleton-loader v-if="loading" type="text" width="50"></v-skeleton-loader>
             <span v-else>{{ stats.actesEnAttente }}</span>
           </div>
@@ -50,15 +80,15 @@
 
       <!-- Card 3: CERTIFICATS ACTIFS -->
       <v-col cols="12" sm="6" md="3">
-        <v-card elevation="0" border rounded="xl" class="pa-5 h-100 stat-card transition-swing">
+        <v-card elevation="0" border rounded="xl" class="pa-5 h-100 stat-card" to="/certificats">
           <div class="d-flex justify-space-between align-start mb-4">
             <v-avatar color="green-lighten-5" size="48" rounded="lg" class="icon-avatar">
-              <v-icon color="green-darken-2">mdi-check-decagram-outline</v-icon>
+              <v-icon color="success" size="24">mdi-certificate-outline</v-icon>
             </v-avatar>
-            <v-chip color="success" size="small" variant="flat" class="font-weight-bold text-caption bg-green-lighten-5 text-green-darken-2">+12%</v-chip>
+            <v-chip color="success" size="small" variant="tonal" class="font-weight-bold text-caption">Certifiés</v-chip>
           </div>
-          <div class="text-overline text-grey-darken-1 font-weight-medium mb-1" style="letter-spacing: 1px;">CERTIFICATS ACTIFS</div>
-          <div class="text-h4 font-weight-black stat-number" style="color: #2e7d32;">
+          <div class="text-overline text-grey-darken-1 font-weight-bold mb-1" style="letter-spacing: 0.8px;">CERTIFICATS ACTIFS</div>
+          <div class="text-h4 font-weight-black" style="color: #059669;">
             <v-skeleton-loader v-if="loading" type="text" width="60"></v-skeleton-loader>
             <span v-else>{{ formatNumber(stats.certificatsActifs) }}</span>
           </div>
@@ -67,15 +97,15 @@
 
       <!-- Card 4: PARCELLES ENREGISTRÉES -->
       <v-col cols="12" sm="6" md="3">
-        <v-card elevation="0" border rounded="xl" class="pa-5 h-100 stat-card transition-swing">
+        <v-card elevation="0" border rounded="xl" class="pa-5 h-100 stat-card" to="/parcelles">
           <div class="d-flex justify-space-between align-start mb-4">
-            <v-avatar color="grey-lighten-4" size="48" rounded="lg" class="icon-avatar">
-              <v-icon color="grey-darken-2">mdi-office-building-outline</v-icon>
+            <v-avatar color="indigo-lighten-5" size="48" rounded="lg" class="icon-avatar">
+              <v-icon color="indigo-darken-2" size="24">mdi-map-marker-radius-outline</v-icon>
             </v-avatar>
-            <v-chip color="grey" size="small" variant="flat" class="font-weight-bold text-caption bg-grey-lighten-4 text-grey-darken-2">Stable</v-chip>
+            <v-chip color="indigo" size="small" variant="tonal" class="font-weight-bold text-caption">Cadastre</v-chip>
           </div>
-          <div class="text-overline text-grey-darken-1 font-weight-medium mb-1" style="letter-spacing: 1px;">PARCELLES ENREGISTRÉES</div>
-          <div class="text-h4 font-weight-black stat-number" style="color: #424242;">
+          <div class="text-overline text-grey-darken-1 font-weight-bold mb-1" style="letter-spacing: 0.8px;">PARCELLES ENREGISTRÉES</div>
+          <div class="text-h4 font-weight-black" style="color: #4338ca;">
             <v-skeleton-loader v-if="loading" type="text" width="70"></v-skeleton-loader>
             <span v-else>{{ formatNumber(stats.parcelles) }}</span>
           </div>
@@ -84,59 +114,77 @@
     </v-row>
 
     <!-- Activités récentes table -->
-    <v-card elevation="0" border rounded="xl" class="mt-8">
-      <div class="d-flex justify-space-between align-center px-6 py-5 border-b">
-        <h2 class="text-subtitle-1 font-weight-bold" style="color: #1a3b5c;">Activités récentes</h2>
-        <div>
-          <v-btn variant="outlined" color="grey-darken-1" size="small" class="mr-3 text-none font-weight-medium" rounded="lg">
-            Filtrer
-          </v-btn>
-          <v-btn variant="text" color="primary" size="small" class="text-none font-weight-bold" to="/actes">
-            Voir tout
+    <v-card elevation="0" border rounded="xl" class="mt-8 overflow-hidden bg-white">
+      <div class="d-flex justify-space-between align-center px-6 py-5 border-b flex-wrap ga-3">
+        <div class="d-flex align-center ga-3">
+          <v-avatar color="blue-lighten-5" size="36" rounded="lg">
+            <v-icon color="primary" size="20">mdi-history</v-icon>
+          </v-avatar>
+          <div>
+            <h2 class="text-subtitle-1 font-weight-bold" style="color: #0f2942;">Activités récentes</h2>
+            <div class="text-caption text-grey-darken-1">Derniers actes et transactions enregistrés</div>
+          </div>
+        </div>
+        <div class="d-flex align-center ga-2">
+          <v-btn variant="tonal" color="primary" size="small" class="text-none font-weight-bold" rounded="lg" to="/actes">
+            Voir tous les actes
+            <v-icon end size="16">mdi-arrow-right</v-icon>
           </v-btn>
         </div>
       </div>
 
-      <v-progress-linear v-if="loadingActivities" indeterminate color="primary"></v-progress-linear>
+      <v-progress-linear v-if="loadingActivities" indeterminate color="primary" height="3"></v-progress-linear>
 
-      <v-table>
+      <v-table hover class="w-100">
         <thead>
           <tr>
-            <th class="text-overline text-grey-darken-1 font-weight-bold py-3">N° ACTE</th>
-            <th class="text-overline text-grey-darken-1 font-weight-bold py-3">VENDEUR</th>
-            <th class="text-overline text-grey-darken-1 font-weight-bold py-3">ACHETEUR</th>
-            <th class="text-overline text-grey-darken-1 font-weight-bold py-3">PARCELLE</th>
-            <th class="text-overline text-grey-darken-1 font-weight-bold py-3">MONTANT</th>
-            <th class="text-overline text-grey-darken-1 font-weight-bold py-3 text-center">STATUT</th>
-            <th class="text-overline text-grey-darken-1 font-weight-bold py-3 text-right">DATE</th>
+            <th class="text-overline font-weight-bold py-3">N° ACTE</th>
+            <th class="text-overline font-weight-bold py-3">VENDEUR</th>
+            <th class="text-overline font-weight-bold py-3">ACHETEUR</th>
+            <th class="text-overline font-weight-bold py-3">PARCELLE</th>
+            <th class="text-overline font-weight-bold py-3">MONTANT</th>
+            <th class="text-overline font-weight-bold py-3 text-center">STATUT</th>
+            <th class="text-overline font-weight-bold py-3 text-right">DATE</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in activities" :key="item.id" class="border-b-thin hover-row transition-swing">
-            <td class="font-weight-bold text-primary py-4">
-              <router-link :to="`/actes/${item.rawId || item.id}`" class="text-primary text-decoration-none font-weight-bold table-link">{{ item.id }}</router-link>
+          <tr v-for="item in activities" :key="item.id" class="hover-row">
+            <td class="font-weight-bold py-4">
+              <router-link :to="`/actes/${item.rawId || item.id}`" class="text-primary text-decoration-none font-weight-bold table-link d-inline-flex align-center ga-1">
+                <v-icon size="16" color="primary">mdi-file-document-outline</v-icon>
+                {{ item.id }}
+              </router-link>
             </td>
-            <td class="text-grey-darken-3 font-weight-medium py-4">{{ item.vendeur }}</td>
-            <td class="text-grey-darken-3 font-weight-medium py-4">{{ item.acheteur }}</td>
-            <td class="text-grey-darken-1 py-4">
-              <div class="d-flex align-center">
-                <v-icon size="small" color="grey-lighten-1" class="mr-2 icon-hover">mdi-map-marker-outline</v-icon>
-                {{ item.parcelle }}
+            <td class="text-grey-darken-4 font-weight-medium py-4">{{ item.vendeur }}</td>
+            <td class="text-grey-darken-4 font-weight-medium py-4">{{ item.acheteur }}</td>
+            <td class="text-grey-darken-2 py-4">
+              <div class="d-flex align-center ga-1">
+                <v-icon size="small" color="grey-darken-1">mdi-map-marker-outline</v-icon>
+                <span>{{ item.parcelle }}</span>
               </div>
             </td>
             <td class="font-weight-bold text-grey-darken-4 py-4">{{ item.montant }} FCFA</td>
             <td class="text-center py-4">
-              <v-chip v-bind="getStatusProps(item.statut)" size="small" class="font-weight-bold px-4 text-caption chip-hover">
+              <v-chip v-bind="getStatusProps(item.statut)" size="small" class="font-weight-bold px-3">
+                <v-icon start size="14" :icon="getStatusIcon(item.statut)"></v-icon>
                 {{ item.statut }}
               </v-chip>
             </td>
-            <td class="text-right text-grey-darken-1 py-4 text-body-2">{{ item.date }}</td>
+            <td class="text-right text-grey-darken-1 py-4 text-body-2 font-weight-medium">{{ item.date }}</td>
           </tr>
           <!-- Empty state -->
           <tr v-if="!loadingActivities && activities.length === 0">
-            <td colspan="7" class="text-center pa-8 text-grey-darken-1">
-              <v-icon size="48" color="grey-lighten-2" class="mb-2">mdi-file-document-outline</v-icon>
-              <div>Aucune activité récente</div>
+            <td colspan="7" class="text-center pa-10">
+              <div class="d-flex flex-column align-center justify-center">
+                <v-avatar color="grey-lighten-4" size="64" class="mb-3">
+                  <v-icon size="32" color="grey-darken-1">mdi-file-document-outline</v-icon>
+                </v-avatar>
+                <div class="text-subtitle-1 font-weight-bold text-grey-darken-3 mb-1">Aucune activité récente</div>
+                <div class="text-caption text-grey-darken-1 mb-4">Créez votre premier acte de vente pour voir apparaître l'activité ici.</div>
+                <v-btn color="primary" size="small" prepend-icon="mdi-plus" rounded="lg" to="/actes/nouveau">
+                  Créer un acte de vente
+                </v-btn>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -146,10 +194,12 @@
     <!-- Footer -->
     <div class="text-center mt-12 mb-6">
       <div class="text-caption font-weight-medium text-grey-darken-2 mb-2">Village de Taofikh Bousso - République du Sénégal © 2024</div>
-      <div class="d-flex justify-center gap-4">
-        <a href="#" class="text-caption text-grey text-decoration-none mx-3 hover-primary transition-colors">Mentions Légales</a>
-        <a href="#" class="text-caption text-grey text-decoration-none mx-3 hover-primary transition-colors">Vérification de Titre</a>
-        <a href="#" class="text-caption text-grey text-decoration-none mx-3 hover-primary transition-colors">Contact</a>
+      <div class="d-flex justify-center ga-4">
+        <a href="#" class="text-caption text-grey text-decoration-none hover-primary transition-colors">Mentions Légales</a>
+        <span class="text-grey-lighten-2">•</span>
+        <a href="#" class="text-caption text-grey text-decoration-none hover-primary transition-colors">Vérification de Titre</a>
+        <span class="text-grey-lighten-2">•</span>
+        <a href="#" class="text-caption text-grey text-decoration-none hover-primary transition-colors">Contact</a>
       </div>
     </div>
   </div>
@@ -233,9 +283,13 @@ const fetchActivities = async () => {
   }
 }
 
-onMounted(() => {
+const refreshAll = () => {
   fetchStats()
   fetchActivities()
+}
+
+onMounted(() => {
+  refreshAll()
 })
 
 const getStatusProps = (statut) => {
@@ -244,6 +298,14 @@ const getStatusProps = (statut) => {
   if (s === 'en attente' || s === 'en_attente' || s === 'brouillon') return { color: 'warning', variant: 'tonal' }
   if (s === 'révoqué' || s === 'revoque' || s === 'annulé' || s === 'annule') return { color: 'error', variant: 'tonal' }
   return { color: 'grey', variant: 'tonal' }
+}
+
+const getStatusIcon = (statut) => {
+  const s = (statut || '').toLowerCase()
+  if (s === 'validé' || s === 'valide') return 'mdi-check-circle-outline'
+  if (s === 'en attente' || s === 'en_attente' || s === 'brouillon') return 'mdi-clock-outline'
+  if (s === 'révoqué' || s === 'revoque' || s === 'annulé' || s === 'annule') return 'mdi-close-circle-outline'
+  return 'mdi-information-outline'
 }
 </script>
 

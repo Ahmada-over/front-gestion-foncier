@@ -4,7 +4,27 @@ const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD
 
 const getToken = () => localStorage.getItem('access_token')
 const setToken = (token) => localStorage.setItem('access_token', token)
-const removeToken = () => localStorage.removeItem('access_token')
+const removeToken = () => {
+  localStorage.removeItem('access_token')
+  localStorage.removeItem('current_user')
+}
+
+const getUser = () => {
+  try {
+    const raw = localStorage.getItem('current_user')
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
+const setUser = (user) => {
+  if (user) {
+    localStorage.setItem('current_user', JSON.stringify(user))
+  } else {
+    localStorage.removeItem('current_user')
+  }
+}
 
 const request = async (endpoint, options = {}) => {
   const headers = {
@@ -26,7 +46,7 @@ const request = async (endpoint, options = {}) => {
     if (response.status === 401) {
       removeToken()
       // Avoid redirect loop: only redirect if not already on login
-      if (!window.location.pathname.startsWith('/login')) {
+      if (!window.location.pathname.startsWith('/login') && !window.location.hash.startsWith('#/login')) {
         window.location.href = '/login'
       }
       throw new Error('Session expirée')
@@ -75,13 +95,25 @@ export const api = {
       })
       if (data.access_token) {
         setToken(data.access_token)
+        try {
+          const user = await request('/auth/me')
+          if (user) setUser(user)
+        } catch (e) {
+          console.warn('Could not fetch user profile on login:', e)
+        }
       }
       return data
     },
     logout: () => {
       removeToken()
     },
-    getMe: () => request('/auth/me'),
+    getMe: async () => {
+      const user = await request('/auth/me')
+      if (user) setUser(user)
+      return user
+    },
+    getUser,
+    setUser,
     isAuthenticated: () => !!getToken()
   },
   actes: {

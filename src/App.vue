@@ -1,40 +1,52 @@
 <template>
   <v-app style="background-color: #f8fafc;">
     <!-- Navigation Drawer -->
-    <v-navigation-drawer v-if="!isLogin" v-model="drawer" app elevation="0" width="280" style="border-right: 1px solid #f1f5f9; background: #ffffff;">
-      <div class="px-5 py-5 d-flex align-center">
-        <v-avatar color="primary" size="42" class="mr-3" style="background: linear-gradient(135deg, #0f2942 0%, #1e40af 100%) !important; box-shadow: 0 4px 10px rgba(15, 41, 66, 0.2);">
-          <v-icon color="white" size="22">mdi-office-building-marker</v-icon>
-        </v-avatar>
-        <div>
-          <div class="font-weight-black text-subtitle-2" style="color: #0f2942; line-height: 1.2; letter-spacing: -0.2px;">TAOFIKH BOUSSO</div>
-          <div class="text-caption text-grey-darken-1 font-weight-medium" style="line-height: 1.2; font-size: 11px;">Gestion Foncière Officielle</div>
+    <v-navigation-drawer
+      v-if="!isLogin"
+      v-model="drawer"
+      :temporary="mobile"
+      app
+      elevation="0"
+      width="280"
+      style="border-right: 1px solid #f1f5f9; background: #ffffff; z-index: 1005;"
+    >
+      <!-- Drawer Header -->
+      <div class="px-5 py-4 d-flex align-center justify-space-between">
+        <div class="d-flex align-center">
+          <v-avatar color="primary" size="42" class="mr-3" style="background: linear-gradient(135deg, #0f2942 0%, #1e40af 100%) !important; box-shadow: 0 4px 10px rgba(15, 41, 66, 0.2);">
+            <v-icon color="white" size="22">mdi-office-building-marker</v-icon>
+          </v-avatar>
+          <div>
+            <div class="font-weight-black text-subtitle-2" style="color: #0f2942; line-height: 1.2; letter-spacing: -0.2px;">TAOFIKH BOUSSO</div>
+            <div class="text-caption text-grey-darken-1 font-weight-medium" style="line-height: 1.2; font-size: 11px;">Gestion Foncière Officielle</div>
+          </div>
         </div>
+        <v-btn v-if="mobile" icon="mdi-close" variant="text" size="small" color="grey-darken-1" @click="drawer = false"></v-btn>
       </div>
 
       <v-divider class="mb-3" style="border-color: #f1f5f9;"></v-divider>
 
       <v-list density="comfortable" nav class="px-3">
-        <v-list-item prepend-icon="mdi-view-dashboard-outline" title="Tableau de bord" value="home" to="/" rounded="xl" class="mb-1"></v-list-item>
-        <v-list-item prepend-icon="mdi-file-document-outline" title="Actes de vente" value="actes" to="/actes" rounded="xl" class="mb-1"></v-list-item>
-        <v-list-item prepend-icon="mdi-certificate-outline" title="Certificats d'occupation" value="certificats" to="/certificats" rounded="xl" class="mb-1"></v-list-item>
-        <v-list-item prepend-icon="mdi-file-undo-outline" title="Décharges" value="decharges" to="/decharges" rounded="xl" class="mb-1"></v-list-item>
-        <v-list-item prepend-icon="mdi-map-marker-outline" title="Parcelles" value="parcelles" to="/parcelles" rounded="xl" class="mb-1"></v-list-item>
-        <v-list-item prepend-icon="mdi-home-group" title="Patrimoine Familial" value="patrimoine" to="/patrimoine" rounded="xl" class="mb-1"></v-list-item>
-        <v-list-item prepend-icon="mdi-account-group-outline" title="Propriétaires" value="proprietaires" to="/proprietaires" rounded="xl" class="mb-1"></v-list-item>
-        <v-list-item prepend-icon="mdi-account-outline" title="Utilisateurs" value="utilisateurs" to="/utilisateurs" rounded="xl" class="mb-1"></v-list-item>
-        <v-list-item prepend-icon="mdi-history" title="Historique" value="historique" to="/historique" rounded="xl"></v-list-item>
+        <v-list-item @click="mobile && (drawer = false)" prepend-icon="mdi-view-dashboard-outline" title="Tableau de bord" value="home" to="/" rounded="xl" class="mb-1"></v-list-item>
+        <v-list-item @click="mobile && (drawer = false)" prepend-icon="mdi-file-document-outline" title="Actes de vente" value="actes" to="/actes" rounded="xl" class="mb-1"></v-list-item>
+        <v-list-item @click="mobile && (drawer = false)" prepend-icon="mdi-certificate-outline" title="Certificats d'occupation" value="certificats" to="/certificats" rounded="xl" class="mb-1"></v-list-item>
+        <v-list-item @click="mobile && (drawer = false)" prepend-icon="mdi-file-undo-outline" title="Décharges" value="decharges" to="/decharges" rounded="xl" class="mb-1"></v-list-item>
+        <v-list-item @click="mobile && (drawer = false)" prepend-icon="mdi-map-marker-outline" title="Parcelles" value="parcelles" to="/parcelles" rounded="xl" class="mb-1"></v-list-item>
+        <v-list-item @click="mobile && (drawer = false)" prepend-icon="mdi-home-group" title="Patrimoine Familial" value="patrimoine" to="/patrimoine" rounded="xl" class="mb-1"></v-list-item>
+        <v-list-item @click="mobile && (drawer = false)" prepend-icon="mdi-account-group-outline" title="Propriétaires" value="proprietaires" to="/proprietaires" rounded="xl" class="mb-1"></v-list-item>
+        <v-list-item @click="mobile && (drawer = false)" prepend-icon="mdi-account-outline" title="Utilisateurs" value="utilisateurs" to="/utilisateurs" rounded="xl" class="mb-1"></v-list-item>
+        <v-list-item @click="mobile && (drawer = false)" prepend-icon="mdi-history" title="Historique" value="historique" to="/historique" rounded="xl"></v-list-item>
       </v-list>
 
       <template v-slot:append>
         <div class="pa-4 m-3 rounded-xl border border-slate-200" style="background: #f8fafc;">
           <div class="d-flex align-center">
-            <v-avatar size="38" color="blue-lighten-4" class="mr-3">
-              <span class="text-caption font-weight-bold text-blue-darken-3">TB</span>
+            <v-avatar size="40" color="primary" class="mr-3" style="background: linear-gradient(135deg, #0f2942 0%, #1e40af 100%) !important; color: white !important;">
+              <span class="text-caption font-weight-bold">{{ userInitials }}</span>
             </v-avatar>
             <div class="overflow-hidden flex-grow-1">
-              <div class="text-subtitle-2 font-weight-bold text-truncate" style="color: #0f2942; line-height: 1.2;">{{ userName }}</div>
-              <div class="text-caption text-grey-darken-1 text-truncate">{{ userRole }}</div>
+              <div class="text-subtitle-2 font-weight-bold text-truncate" style="color: #0f2942; line-height: 1.2;" :title="userName">{{ userName }}</div>
+              <div class="text-caption text-grey-darken-1 text-truncate" :title="userRole">{{ userRole }}</div>
             </div>
           </div>
         </div>
@@ -42,10 +54,18 @@
     </v-navigation-drawer>
 
     <!-- App Bar -->
-    <v-app-bar v-if="!isLogin" app color="white" elevation="0" height="70" class="modern-app-bar">
-      <v-app-bar-nav-icon @click="drawer = !drawer" class="hidden-md-and-up"></v-app-bar-nav-icon>
+    <v-app-bar v-if="!isLogin" app color="white" elevation="0" height="70" class="modern-app-bar px-2 px-sm-4 border-b">
+      <!-- Responsive Mobile/Tablet Hamburger Toggle Button -->
+      <v-btn
+        icon="mdi-menu"
+        variant="text"
+        color="primary"
+        class="d-md-none mr-2"
+        @click.stop="drawer = !drawer"
+        aria-label="Ouvrir le menu"
+      ></v-btn>
 
-      <div class="px-4 w-100" style="max-width: 520px;">
+      <div class="px-1 px-sm-2 flex-grow-1" style="max-width: 480px;">
         <v-menu
           v-model="showSearchResults"
           :close-on-content-click="false"
@@ -194,26 +214,36 @@
 
       <v-spacer></v-spacer>
 
-      <div class="d-flex align-center pr-4 ga-1">
-        <v-tooltip text="Notifications" location="bottom">
+      <!-- Right Header Actions with Dynamic Connected User -->
+      <div class="d-flex align-center ga-1 ga-sm-2">
+        <v-menu location="bottom end" offset="8">
           <template v-slot:activator="{ props }">
-            <v-btn v-bind="props" icon variant="text" color="grey-darken-1" size="small">
-              <v-badge color="error" dot>
-                <v-icon>mdi-bell-outline</v-icon>
-              </v-badge>
+            <v-btn v-bind="props" variant="text" rounded="pill" class="text-none px-2 d-flex align-center">
+              <v-avatar size="34" color="primary" class="mr-1 mr-sm-2" style="background: linear-gradient(135deg, #0f2942 0%, #1e40af 100%) !important; color: white !important;">
+                <span class="text-caption font-weight-bold" style="font-size: 12px;">{{ userInitials }}</span>
+              </v-avatar>
+              <div class="d-none d-sm-flex flex-column text-left mr-1">
+                <span class="text-caption font-weight-bold text-grey-darken-3 text-truncate" style="max-width: 140px; line-height: 1.1;">{{ userName }}</span>
+                <span class="text-grey-darken-1" style="font-size: 10px; line-height: 1.1;">{{ userRole }}</span>
+              </div>
+              <v-icon size="16" color="grey-darken-1">mdi-chevron-down</v-icon>
             </v-btn>
           </template>
-        </v-tooltip>
-
-        <v-tooltip text="Paramètres" location="bottom">
-          <template v-slot:activator="{ props }">
-            <v-btn v-bind="props" icon="mdi-cog-outline" variant="text" color="grey-darken-1" size="small"></v-btn>
-          </template>
-        </v-tooltip>
+          <v-card min-width="240" rounded="xl" elevation="6" class="pa-2 border">
+            <div class="px-3 py-2">
+              <div class="text-subtitle-2 font-weight-bold text-truncate" style="color: #0f2942;">{{ userName }}</div>
+              <div class="text-caption text-grey text-truncate">{{ userEmail }}</div>
+              <v-chip size="x-small" color="primary" variant="tonal" class="mt-1 font-weight-bold">{{ userRole }}</v-chip>
+            </div>
+            <v-divider class="my-1"></v-divider>
+            <v-list-item prepend-icon="mdi-account-outline" title="Gestion Utilisateurs" to="/utilisateurs" rounded="lg" density="compact"></v-list-item>
+            <v-list-item prepend-icon="mdi-logout" title="Déconnexion" rounded="lg" density="compact" color="error" @click="handleLogout"></v-list-item>
+          </v-card>
+        </v-menu>
 
         <v-tooltip text="Se déconnecter" location="bottom">
           <template v-slot:activator="{ props }">
-            <v-btn v-bind="props" icon="mdi-logout" variant="text" color="grey-darken-1" size="small" @click="handleLogout"></v-btn>
+            <v-btn v-bind="props" icon="mdi-logout" variant="text" color="grey-darken-1" size="small" class="d-none d-md-flex" @click="handleLogout"></v-btn>
           </template>
         </v-tooltip>
       </div>
@@ -221,7 +251,7 @@
 
     <!-- Main Content -->
     <v-main>
-      <v-container fluid :class="isLogin ? 'pa-0 h-100' : 'pa-6'" :style="isLogin ? 'max-width: none;' : 'max-width: 1400px;'">
+      <v-container fluid :class="isLogin ? 'pa-0 h-100' : 'pa-3 pa-sm-6'" :style="isLogin ? 'max-width: none;' : 'max-width: 1400px;'">
         <router-view v-slot="{ Component }">
           <transition name="fade-slide" mode="out-in">
             <component :is="Component" />
@@ -279,18 +309,43 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useDisplay } from 'vuetify'
 import { api } from './services/api'
 import { notification } from './services/notifier'
 
 const route = useRoute()
 const router = useRouter()
+const { mobile } = useDisplay()
 const isLogin = computed(() => route.name === 'login')
 
-const drawer = ref(true)
-const userName = ref('Taofikh Bousso')
-const userRole = ref('Admin Principal')
+const drawer = ref(!mobile.value)
+const currentUser = ref(api.auth.getUser() || null)
+
+const userName = computed(() => {
+  if (!currentUser.value) return 'Administrateur'
+  const full = `${currentUser.value.prenom || ''} ${currentUser.value.nom || ''}`.trim()
+  return full || currentUser.value.email || 'Utilisateur'
+})
+
+const userEmail = computed(() => currentUser.value?.email || '')
+
+const userRole = computed(() => {
+  const r = currentUser.value?.role
+  if (r === 'admin') return 'Administrateur'
+  if (r === 'agent') return 'Agent Foncier'
+  if (r === 'lecteur') return 'Lecteur'
+  return r || 'Connecté'
+})
+
+const userInitials = computed(() => {
+  if (!currentUser.value) return 'TB'
+  const p = (currentUser.value.prenom || '')[0] || ''
+  const n = (currentUser.value.nom || '')[0] || ''
+  if (p || n) return (p + n).toUpperCase()
+  return (currentUser.value.email || 'TB').substring(0, 2).toUpperCase()
+})
 
 // --- Global Search ---
 const globalSearch = ref('')
@@ -382,28 +437,31 @@ onMounted(() => document.addEventListener('click', onClickOutside))
 onUnmounted(() => document.removeEventListener('click', onClickOutside))
 
 const fetchUser = async () => {
-  if (!api.auth.isAuthenticated()) return
+  if (!api.auth.isAuthenticated()) {
+    currentUser.value = null
+    return
+  }
   try {
     const user = await api.auth.getMe()
     if (user) {
-      userName.value = user.nom || user.prenom ? `${user.prenom || ''} ${user.nom || ''}`.trim() : user.email
-      userRole.value = user.role || 'Utilisateur'
+      currentUser.value = user
     }
-  } catch {
-    // Keep defaults
+  } catch (err) {
+    console.warn('Erreur chargement session utilisateur:', err)
   }
 }
 
 const handleLogout = () => {
   api.auth.logout()
+  currentUser.value = null
   router.push('/login')
 }
 
-onMounted(() => {
+watch(() => route.path, () => {
   if (!isLogin.value) {
     fetchUser()
   }
-})
+}, { immediate: true })
 </script>
 
 <style>
